@@ -1,0 +1,61 @@
+# Project configuration — single source of truth for tools, IDs, and
+# business-goal priorities. Filled in by /configure from the BRD in BRD/.
+# Everything here is read by CLAUDE.md, /architect, /run-manager, and any
+# tool-mirror skill (e.g. clickup-log) before they do anything else.
+
+project:
+  name: ""              # short project name
+  description: ""       # one-line what/why
+  configured: false     # /configure flips this true once filled
+
+# Path to the generated business-logic doc (goals, priority order, success
+# criteria — human-readable, derived from the BRD).
+business_logic_doc: docs/business-logic.md
+
+# Durable task log — single source of truth for what's done/pending.
+task_log: TASK_LOG.md
+
+# --- Manager agent -----------------------------------------------------
+# /run-manager reads this. business_goals is priority-ordered (index 0 =
+# highest priority), matching the pattern used by run-manager.md's
+# "Business Goals (priority order)" section. analysis_command is whatever
+# project-specific script/check produces the data the manager agent
+# evaluates against those goals (e.g. a test suite, a report generator,
+# a benchmark script) — leave blank until the project has one.
+manager:
+  business_goals: []
+  # - "All X assigned/completed — zero-miss is the target"
+  # - "Minimize resource Y used"
+  analysis_command: ""      # e.g. "python scripts/manager_analysis.py --report output/manager_report.json"
+  report_path: ""           # where analysis_command writes its output, if any
+  severity_thresholds: {}   # optional: metric -> {warning, fail} pairs
+
+# --- Skill registry ------------------------------------------------------
+# Project-specific leaf skills (.claude/commands/*.md) that /architect can
+# dispatch to. Add one entry per skill as the codebase grows — see
+# pep_routing_solution_parcel's fix-routing.md / dataset-fix.md for the
+# pattern a leaf skill follows (a Module Map + fix procedure specific to
+# this codebase).
+skills:
+  registry: []
+  # - name: fix-routing
+  #   trigger: "routing / solver output bug"
+  #   file: .claude/commands/fix-routing.md
+
+# --- External tool mirrors ----------------------------------------------
+# Enable and fill only the tools this project actually uses. Each
+# tool-mirror skill (e.g. clickup-log.md) reads its own block here instead
+# of hardcoding IDs, so the skill file itself never needs project-specific
+# edits.
+tools:
+  clickup:
+    enabled: false
+    parent_task_id: ""     # ClickUp task that all TASK_LOG.md rows mirror under, as subtasks
+    list_id: ""
+    mirror_from_date: ""   # ISO date; rows before this are never backfilled
+  github:
+    enabled: false
+    repo: ""                # owner/repo
+  slack:
+    enabled: false
+    channel: ""
