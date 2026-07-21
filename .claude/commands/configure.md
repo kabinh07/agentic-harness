@@ -48,7 +48,7 @@ what `/run-manager` uses as its rubric.
   must stay in sync.
 - `manager.analysis_command` / `manager.report_path`: leave blank if the
   project has no analysis tooling yet (typical for a brand-new project) —
-  don't invent a script that doesn't exist. Note in the report (Step 6)
+  don't invent a script that doesn't exist. Note in the report (Step 8)
   that these need filling once such tooling exists.
 - `tools.*`: for each tool mentioned in the BRD, set `enabled: true`. Any
   ID that requires a real external lookup (a ClickUp parent task ID, a
@@ -59,24 +59,43 @@ what `/run-manager` uses as its rubric.
   in (name/description/goals at minimum — tool IDs can stay pending if the
   user defers them, but note that in the report).
 
-### Step 5 — Seed `TASK_LOG.md`
-Leave the schema as-is (table header, status legend, source convention).
-Only touch `_Last updated:` (set to today) and, if any `tools.*.enabled` is
-true, confirm the header note about mirroring already names the right
-skill/date — update `mirror_from_date` in config to today if this is the
-first `/configure` run.
+### Step 5 — First-pass segmentation (`architecture.segments`)
+If the BRD names distinct components/subsystems (e.g. "a scraper, a
+scoring engine, a dashboard"), seed `architecture.segments` with one entry
+per component: `name`, `description`, `trigger` (what kind of task routes
+here). Leave `owns_paths`, `agent`, and `test_command` blank — there's no
+code yet to own paths or a test command to run. `/architect` fills those
+in and creates the actual `.claude/agents/<segment>.md` subagent the first
+time it runs against real code (see `architect.md` Phase 1.5). If the BRD
+is too abstract to name real components yet, leave `segments: []` —
+don't invent a breakdown from nothing; that's `/architect`'s job once
+there's code to look at.
 
-### Step 6 — Update `CLAUDE.md`
+### Step 6 — Confirm `docs/engineering-standards.md`
+The generic defaults ship as-is. Only add to "Project-specific additions"
+if the BRD states an explicit, concrete convention (a required framework,
+a compliance rule, a hard performance budget) — don't pad it with generic
+best-practice filler.
+
+### Step 7 — Seed `TASK_LOG.md`
+Leave the schema as-is (table header, status legend, source convention,
+Goal column). Only touch `_Last updated:` (set to today) and, if any
+`tools.*.enabled` is true, confirm the header note about mirroring already
+names the right skill/date — update `mirror_from_date` in config to today
+if this is the first `/configure` run.
+
+### Step 8 — Update `CLAUDE.md`
 Nothing structural changes — the load order and agent descriptions stay
 generic. Do not inline project specifics into `CLAUDE.md` itself; they
 belong in `config/project.config.yaml` and `docs/business-logic.md`. If a
 prior `/configure` run left stale placeholder text anywhere, clean it up,
 but the file's job is to point at config, not duplicate it.
 
-### Step 7 — Report (≤10 lines)
+### Step 9 — Report (≤10 lines)
 ```
 Project: <name>
 Goals extracted: N (see docs/business-logic.md)
+Segments seeded: N (or "none — no code yet, /architect will segment on first run")
 Tools enabled: <list, or "none">
 Tools needing IDs still: <list, or "none">
 manager.analysis_command: <set / not yet — project has no analysis tooling>

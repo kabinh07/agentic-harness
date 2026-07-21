@@ -30,7 +30,7 @@ step (see `architect.md`'s "TASK_LOG.md always up to date" invariant).
 - `parent`: `config.tools.clickup.parent_task_id`
 - `list_id`: `config.tools.clickup.list_id`
 - `name`: short title (≤ ~70 chars — the headline, not the full TASK_LOG paragraph)
-- `markdown_description`: 2-4 sentence summary (what / why / root cause if known) — not the full verbose TASK_LOG text
+- `markdown_description`: 2-4 sentence summary (what / why / root cause if known, plus the Goal column's value so the business rationale travels with the task) — not the full verbose TASK_LOG text
 - `start_date`: the TASK_LOG "Started" date (YYYY-MM-DD)
 - `due_date`: only if a real deadline exists; otherwise omit
 - `status`: mapped per the table below

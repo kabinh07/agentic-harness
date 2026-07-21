@@ -7,8 +7,11 @@ description: Run the manager agent — analyse project state against docs/busine
 
 Analyses project state against the priority-ordered business goals in
 `docs/business-logic.md` (mirrored, condensed, in `config/project.config.yaml`'s
-`manager.business_goals`). Writes tasks to `TASK_LOG.md`. Never fixes
-anything itself — it queues work for `/architect`.
+`manager.business_goals`). Writes tasks to `TASK_LOG.md`, each one tagged
+with the exact goal it serves — this file is the guardrail that keeps
+task creation tied to the BRD instead of drifting into whatever seems
+locally interesting. Never fixes anything itself — it queues work for
+`/architect`, which segments, dispatches, and gates it.
 
 ## Usage
 
@@ -43,8 +46,15 @@ Avoid duplicate tasks — check open ⏳/🔄 rows before adding a new one for
 the same issue.
 
 ### Step 5 — Append new tasks
-Only add 🔴/🟡 tasks (see Severity below). Format:
-`| N | <task with specifics> | Manager YYYY-MM-DD | 🔴/🟡 | ⏳ TODO | <skill or —> | — | — |`
+Only add 🔴/🟡 tasks (see Severity below). Every row must name the exact
+goal (from `docs/business-logic.md`) the task closes the gap on — if a
+finding doesn't trace to any documented goal, it's not a task, it's an
+observation; note it in the run report instead of queuing it. Format:
+`| N | <task with specifics> | <goal it serves> | Manager YYYY-MM-DD | 🔴/🟡 | ⏳ TODO | <agent segment, or — if unstaffed> | — | — |`
+
+Leave the Agent column as `—` if `architecture.segments` doesn't yet have
+a segment covering this task's area — `/architect` resolves that at
+dispatch time (Phase 1.5), the manager doesn't guess at segmentation.
 
 For each tool under `config.tools` with `enabled: true`, invoke its
 mirror skill (e.g. `/clickup-log`) to sync each new row, respecting that

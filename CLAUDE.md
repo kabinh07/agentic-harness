@@ -8,11 +8,15 @@ new project unchanged.
 ## Load order (do this before any development work)
 
 1. `config/project.config.yaml` — tools enabled, external IDs, business-goal
-   priorities, registered skills. If `project.configured` is `false`, stop
-   and run `/configure` first (see below) — do not guess at IDs or goals.
+   priorities, codebase segments (`architecture.segments`). If
+   `project.configured` is `false`, stop and run `/configure` first (see
+   below) — do not guess at IDs or goals.
 2. `docs/business-logic.md` — the business goals/success-criteria this
    project is judged against, in priority order. Generated from the BRD.
-3. `TASK_LOG.md` — durable task history. Single source of truth for what's
+   Every task, from either agent, must trace back to a goal here.
+3. `docs/engineering-standards.md` — the code-quality bar `/architect`
+   enforces on every task before marking it done.
+4. `TASK_LOG.md` — durable task history. Single source of truth for what's
    done, in progress, or pending. Read it before planning any new work to
    avoid duplicate tasks.
 
@@ -30,28 +34,46 @@ new project unchanged.
 
 ## Agents
 
-- **`/architect`** — orchestrator. Reads `TASK_LOG.md` + config, plans, and
-  dispatches to the right skill. Project-specific skills are registered in
-  `config/project.config.yaml`'s `skills.registry`; anything not matching a
-  registered skill it either handles directly or asks about.
-- **`/run-manager`** — periodic health-check / manager agent. Runs
-  `config.manager.analysis_command` (project-specific — a test suite, report
-  generator, benchmark script, whatever produces signal), evaluates the
-  result against `docs/business-logic.md`'s priority-ordered goals, and
-  appends new 🔴/🟡 tasks to `TASK_LOG.md`. It does not fix things itself —
-  it queues work for `/architect`.
+- **`/run-manager`** — the business-goal owner. Runs
+  `config.manager.analysis_command` (project-specific — a test suite,
+  report generator, benchmark script, whatever produces signal), evaluates
+  the result against `docs/business-logic.md`'s priority-ordered goals,
+  and appends new 🔴/🟡 tasks to `TASK_LOG.md` — every task tagged with
+  the exact goal it serves. It does not fix things itself and does not
+  decide segmentation — it queues work for `/architect`.
+- **`/architect`** — the senior-engineer orchestrator, owns the technical
+  side: efficiency, integrity, scalability, quality. Reads `TASK_LOG.md` +
+  config, keeps `config/project.config.yaml`'s `architecture.segments`
+  current by categorizing the codebase into owned areas, and creates a
+  scoped subagent per segment under `.claude/agents/`. It **delegates
+  implementation to the owning segment subagent by default** (via the
+  Agent tool, so each subagent's context stays scoped to its own area
+  instead of the whole codebase) — it writes code directly only when
+  delegation genuinely isn't worth it (a one-line fix, a cross-cutting
+  change no segment owns). Either way, before marking a task ✅ DONE it
+  gates on three things: the standing `test-writer` agent having written
+  independent tests for the change, those tests passing, and an
+  architecture/standards review against `docs/engineering-standards.md`.
 - **Tool-mirror skills** (e.g. `/clickup-log`) — mirror every `TASK_LOG.md`
   write to whichever external tracker is enabled under `tools:` in config.
   Only mirror rows dated on/after that tool's `mirror_from_date`; never
   backfill history written before the mirror was wired up.
 
-## Adding project-specific skills
+## Subagents (`.claude/agents/`)
 
-As the codebase grows, add `.claude/commands/<skill>.md` files for
-recurring fix/build patterns specific to this project (a "Module Map" of
-where things live plus a fix procedure — see any mature sibling project's
-`fix-routing.md`-style skill for the shape). Register each one in
-`config/project.config.yaml`'s `skills.registry` with a `trigger`
-description so `/architect` knows when to dispatch to it. These skills are
-the one part of this harness that is NOT meant to be generic — they encode
-this specific codebase's structure.
+Two kinds:
+
+- **Segment subagents** — not hand-authored; `/architect` creates and
+  maintains these as it segments the codebase (see `architect.md`
+  Phase 1.5). Each one is scoped to a single area (`owns_paths`), knows
+  its own test command, and is the only thing that ever edits its area.
+  This is what keeps both architect's own context and each subagent's
+  context small: architect only ever holds routing decisions, not
+  implementation detail, and each subagent only ever holds its one
+  segment, not the whole codebase. Genuinely per-project — encodes this
+  specific codebase's structure.
+- **`test-writer`** — the one standing exception, shipped as a ready-made
+  template (`.claude/agents/test-writer.md`), not authored per project.
+  Cross-cutting, owns no paths, and is dispatched after every
+  implementation task to write that change's tests — deliberately never
+  the same agent that wrote the implementation.
