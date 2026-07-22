@@ -1,44 +1,59 @@
 # agentic-harness
 
-Reusable scaffold for the agentic dev workflow used on `pep_routing_solution_parcel`:
-a manager agent that owns the business goals, a senior-engineer architect
-agent that segments the codebase and staffs a scoped subagent per segment,
-a durable `TASK_LOG.md` gated on passing tests, and optional mirroring to
-external trackers (ClickUp, etc). This repo is the generic shell — drop it
-into a new project and configure it from a BRD.
+A Claude Code plugin for a reusable agentic dev workflow: a manager agent
+that owns the business goals, a senior-engineer architect agent that
+segments the codebase and staffs a scoped subagent per segment, a durable
+`TASK_LOG.md` gated on passing tests, and optional mirroring to external
+trackers (ClickUp, etc).
 
-## Quickstart
+## Install
 
-```bash
-# 1. Copy this harness into a new (or existing) project
-cp -r agentic-harness/{CLAUDE.md,config,BRD,docs,TASK_LOG.md,.claude} /path/to/new-project/
+From inside Claude Code, in any project:
 
-# 2. Drop a BRD (any format) into BRD/
-cp ~/Downloads/my-project-brd.pdf /path/to/new-project/BRD/
-
-# 3. From inside the new project, in Claude Code:
-/configure
+```
+/plugin marketplace add /path/to/agentic-harness
+/plugin install agentic-harness
 ```
 
-`/configure` reads the BRD and fills `config/project.config.yaml` (business
-goals, tool IDs, a first-pass component breakdown if the BRD names any)
-and `docs/business-logic.md` (the human-readable rubric), seeds
-`TASK_LOG.md`, and asks for anything it can't infer (e.g. a ClickUp parent
-task ID needs a real lookup, not a guess).
+(or, once published, `/plugin marketplace add kabinh07/agentic-harness`).
 
-Once there's real code, run `/architect` — its first job is always to
-segment the codebase into owned areas and create a subagent per segment
-under `.claude/agents/` (see below) before it dispatches any task.
+This gives you five commands and one agent, available in every project:
+
+- `/agentic-harness:init`
+- `/agentic-harness:configure`
+- `/agentic-harness:architect`
+- `/agentic-harness:run-manager`
+- `/agentic-harness:clickup-log`
+- agent `agentic-harness:test-writer`
+
+## Quickstart (in a project you want the harness in)
+
+```
+/agentic-harness:init          # scaffolds CLAUDE.md, config/, docs/, TASK_LOG.md, BRD/
+```
+
+Then drop a BRD (business requirements doc — any format) into `BRD/`, and:
+
+```
+/agentic-harness:configure     # reads the BRD, fills config + business-logic.md, seeds TASK_LOG.md
+```
+
+Once there's real code, run `/agentic-harness:architect` — its first job is
+always to segment the codebase into owned areas and create a subagent per
+segment under `.claude/agents/` (project-local, not part of this plugin)
+before it dispatches any task.
 
 ## How a task moves through the system
 
-1. **`/run-manager`** checks project state against `docs/business-logic.md`'s
-   priority-ordered goals and writes a task to `TASK_LOG.md` — every row
-   tagged with the exact goal it serves. No goal, no task; observations
-   that don't trace to a goal get reported, not queued.
-2. **`/architect`** picks it up. If the codebase has grown since the last
-   segmentation, it re-segments first (`architecture.segments` in config)
-   and creates/updates the relevant `.claude/agents/<segment>.md` subagent.
+1. **`/agentic-harness:run-manager`** checks project state against
+   `docs/business-logic.md`'s priority-ordered goals and writes a task to
+   `TASK_LOG.md` — every row tagged with the exact goal it serves. No goal,
+   no task; observations that don't trace to a goal get reported, not
+   queued.
+2. **`/agentic-harness:architect`** picks it up. If the codebase has grown
+   since the last segmentation, it re-segments first
+   (`architecture.segments` in config) and creates/updates the relevant
+   `.claude/agents/<segment>.md` subagent.
 3. Architect dispatches the task to that segment's subagent via the Agent
    tool — the subagent gets the task, its own `owns_paths` boundary, and
    the goal it serves; nothing else. This is what keeps context small on
@@ -48,10 +63,10 @@ under `.claude/agents/` (see below) before it dispatches any task.
    one-line fix, a change no single segment owns).
 4. The subagent (or architect-direct) implements the change, scoped to its
    own area.
-5. Architect dispatches the standing `test-writer` agent to write tests
-   for exactly that change — deliberately never the same agent that wrote
-   the implementation. No implementation task is done without tests from
-   this independent pass.
+5. Architect dispatches the standing `agentic-harness:test-writer` agent to
+   write tests for exactly that change — deliberately never the same agent
+   that wrote the implementation. No implementation task is done without
+   tests from this independent pass.
 6. Architect gates completion on three things before touching the status
    column: the test-writer's tests existing, the segment's tests passing
    (including the new ones), and an architecture/standards review against
@@ -61,45 +76,24 @@ under `.claude/agents/` (see below) before it dispatches any task.
 7. `TASK_LOG.md` gets the final status; any enabled tool mirror
    (`config.tools.*`) syncs it out.
 
-## What's generic vs. project-specific
+## What's plugin-shipped vs. project-specific
 
-| Generic (ships as-is) | Project-specific (fill in / grows per project) |
+| Plugin-shipped (this repo) | Project-specific (grown per install) |
 |---|---|
-| `CLAUDE.md` load order | `config/project.config.yaml` values |
-| `architect.md` phase structure (segment → dispatch → gate → review) | `docs/business-logic.md` content |
-| `run-manager.md` phase structure | `manager.analysis_command` (your test/report script) |
-| `TASK_LOG.md` schema | `architecture.segments` and their `.claude/agents/*.md` subagents |
-| `clickup-log.md` (any tool-mirror skill) | `docs/engineering-standards.md`'s "Project-specific additions" |
+| `commands/*.md` phase structure (configure/architect/run-manager/clickup-log) | `config/project.config.yaml` values |
+| `agents/test-writer.md` | `docs/business-logic.md` content |
+| `templates/CLAUDE.md` load order | `docs/engineering-standards.md`'s "Project-specific additions" |
+| `templates/TASK_LOG.md` schema | `architecture.segments` and their `.claude/agents/*.md` subagents |
 
 The orchestration shell doesn't change between projects. What changes is
-the config it reads and the segment subagents it dispatches to — and
-those are grown by `/architect` itself, not hand-authored per project.
+the config it reads and the segment subagents it dispatches to — and those
+are grown by `/agentic-harness:architect` itself, not hand-authored per
+project.
 
-## Layout
+## Adding project-specific segment agents
 
-```
-CLAUDE.md                    # load order: config -> business-logic -> standards -> TASK_LOG
-config/project.config.yaml   # tools, IDs, business-goal priorities, architecture.segments
-BRD/                         # drop the business requirements doc here
-docs/
-  business-logic.md           # generated rubric — what /run-manager judges against
-  engineering-standards.md    # code-quality bar /architect enforces at review time
-TASK_LOG.md                  # durable task history (Goal-tagged, test-gated)
-.claude/
-  commands/
-    configure.md               # bootstrap: BRD -> config + business-logic.md + TASK_LOG.md
-    architect.md                 # orchestrator: segment, delegate, test, gate, review
-    run-manager.md                 # goal-owning, periodic health-check / task-queuing agent
-    clickup-log.md                  # example tool-mirror skill (ClickUp)
-  agents/
-    test-writer.md               # ships as-is — standing, cross-cutting test author
-                                  # everything else here: NOT hand-authored — /architect
-                                  # creates one segment agent per codebase area, first run
-```
-
-## Adding project-specific skills
-
-You don't hand-author segment agents — `/architect` does that as part of
-Phase 1.5 ("Segment & Staff") the first time it runs against real code,
-and re-segments whenever new areas appear that no existing segment's
-`owns_paths` covers. Force a re-scan any time with `/architect resegment`.
+You don't hand-author segment agents — `/agentic-harness:architect` does
+that as part of Phase 1.5 ("Segment & Staff") the first time it runs
+against real code, and re-segments whenever new areas appear that no
+existing segment's `owns_paths` covers. Force a re-scan any time with
+`/agentic-harness:architect resegment`.

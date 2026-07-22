@@ -3,7 +3,7 @@ name: architect
 description: Primary orchestrator — senior-engineer role. Segments the codebase into owned areas, staffs a scoped subagent per segment plus a standing test-writer agent, delegates tasks to them (implementing directly only when required), and gates every task on independently-written passing tests and architecture/standards review before marking it done.
 ---
 
-# /architect
+# /agentic-harness:architect
 
 Single entry point for all technical work. Plans, segments, delegates, gates,
 verifies — owns efficiency, integrity, scalability, and quality. Delegates
@@ -19,17 +19,17 @@ file never needs project-specific edits.
 ## Invocation
 
 ```
-/architect                    # execute pending tasks from TASK_LOG.md
-/architect from-manager       # manager just wrote new tasks
-/architect <user request>     # plan + execute
-/architect status             # show TASK_LOG.md without executing
-/architect resegment          # force a re-scan of architecture.segments
+/agentic-harness:architect                    # execute pending tasks from TASK_LOG.md
+/agentic-harness:architect from-manager       # manager just wrote new tasks
+/agentic-harness:architect <user request>     # plan + execute
+/agentic-harness:architect status             # show TASK_LOG.md without executing
+/agentic-harness:architect resegment          # force a re-scan of architecture.segments
 ```
 
 ## Phase 0 — Preconditions
 
 If `config/project.config.yaml`'s `project.configured` is `false`, stop and
-tell the user to run `/configure` first.
+tell the user to run `/agentic-harness:configure` first.
 
 ## Phase 1 — Orient
 
@@ -57,7 +57,7 @@ always on `resegment`.
    ```
    ---
    name: <segment-slug>
-   description: <what this owns and when to invoke it — this is what /architect
+   description: <what this owns and when to invoke it — this is what /agentic-harness:architect
      matches tasks against, so be specific about the trigger conditions>
    tools: <minimum needed — usually Read, Edit, Grep, Bash; add Write only if
      the segment creates new files>
@@ -82,12 +82,13 @@ always on `resegment`.
    one (one-off, cross-cutting), architect handles it directly instead of
    forcing a segment.
 6. Alongside segment agents, architect maintains one standing, cross-cutting
-   `test-writer` agent (`.claude/agents/test-writer.md`, shipped as a
-   ready-made template — not something architect authors per project, since
-   "write tests for this change" isn't codebase-specific the way a segment
-   is). It reads whatever a segment agent (or architect-direct) just changed
-   and writes the tests for it. Register it under
-   `config/project.config.yaml`'s `architecture.test_agent`.
+   test-writer agent, shipped by the agentic-harness plugin itself as
+   `agentic-harness:test-writer` (Agent tool `subagent_type`) — not
+   something architect authors per project, since "write tests for this
+   change" isn't codebase-specific the way a segment is. It reads whatever
+   a segment agent (or architect-direct) just changed and writes the tests
+   for it. Registered under `config/project.config.yaml`'s
+   `architecture.test_agent`.
 
 Never let two segments' `owns_paths` overlap — if a change legitimately
 needs both, that's two tasks (one per segment) or a sign the segmentation
@@ -104,7 +105,7 @@ itself needs revising, not a reason to let one agent touch both areas.
    mark it explicitly as infra/tooling (allowed, but labeled), or drop it.
 8. Write to TASK_LOG.md first — all new tasks get ⏳ TODO, with Goal and
    Agent filled in. For each tool under `config.tools` with
-   `enabled: true`, invoke that tool's mirror skill (e.g. `/clickup-log`)
+   `enabled: true`, invoke that tool's mirror skill (e.g. `/agentic-harness:clickup-log`)
    to sync the new row.
 9. List tasks, ask "Which to run? (all / numbers / none)". Wait for reply.
 
@@ -135,8 +136,8 @@ b. Implement: dispatch to the owning segment's agent (Agent tool,
    if this is an architect-direct case, implement it inline and say why
    delegation was skipped.
 c. Test generation — MANDATORY, every implementation task, no exceptions
-   for architect-direct either: dispatch the standing `test-writer` agent
-   with the change (diff or summary), the segment's owns_paths, and the
+   for architect-direct either: dispatch the standing `agentic-harness:test-writer`
+   agent with the change (diff or summary), the segment's owns_paths, and the
    goal it serves. It writes or extends tests covering the change against
    the project's existing test framework/patterns. A task with no
    accompanying tests from this step is not done — the test-writer being

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "agentic-harness",
+  "description": "Manager + architect agentic dev workflow for Claude Code.",
+  "owner": {
+    "name": "Kabin",
+    "url": "https://github.com/kabinh07"
+  },
+  "plugins": [
+    {
+      "name": "agentic-harness",
+      "description": "Manager agent owns business goals, architect agent segments the codebase and delegates to scoped subagents, TASK_LOG gated on independent tests.",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}

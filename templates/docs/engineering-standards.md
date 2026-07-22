@@ -1,6 +1,6 @@
 # Engineering Standards
 
-> Enforced by `/architect` on every task before it's marked ✅ DONE — see
+> Enforced by `/agentic-harness:architect` on every task before it's marked ✅ DONE — see
 > `architect.md`'s Architecture Review step. Generic defaults below; add
 > project-specific conventions under "Project-specific additions" as they
 > emerge. Don't relitigate the defaults per task — they're the baseline.

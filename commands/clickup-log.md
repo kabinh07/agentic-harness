@@ -3,7 +3,7 @@ name: clickup-log
 description: Mirror TASK_LOG.md entries as ClickUp subtasks under config.tools.clickup.parent_task_id, and log status changes as comments. Invoke every time TASK_LOG.md is written to, for tasks dated on/after config.tools.clickup.mirror_from_date only.
 ---
 
-# /clickup-log
+# /agentic-harness:clickup-log
 
 Mirrors `TASK_LOG.md` into ClickUp as subtasks under the parent task
 identified by `config.tools.clickup.parent_task_id` (list
@@ -18,7 +18,7 @@ invoke it, and don't ask the user to enable it unprompted.
 ## When to invoke
 
 Any time `TASK_LOG.md` is written to — new row added, status changed, task
-completed — whether done through `/architect`, `/run-manager`, or a direct
+completed — whether done through `/agentic-harness:architect`, `/agentic-harness:run-manager`, or a direct
 manual edit. Treat a TASK_LOG.md edit and its ClickUp sync as one atomic
 step (see `architect.md`'s "TASK_LOG.md always up to date" invariant).
 

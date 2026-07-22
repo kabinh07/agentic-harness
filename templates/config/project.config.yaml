@@ -1,17 +1,17 @@
 # Project configuration — single source of truth for tools, IDs, business-goal
-# priorities, and codebase segmentation. Filled in by /configure from the BRD
-# in BRD/, then kept current by /architect as the codebase grows. Everything
-# here is read by CLAUDE.md, /architect, /run-manager, and any tool-mirror
+# priorities, and codebase segmentation. Filled in by /agentic-harness:configure from the BRD
+# in BRD/, then kept current by /agentic-harness:architect as the codebase grows. Everything
+# here is read by CLAUDE.md, /agentic-harness:architect, /agentic-harness:run-manager, and any tool-mirror
 # skill (e.g. clickup-log) before they do anything else.
 
 project:
   name: ""              # short project name
   description: ""       # one-line what/why
-  configured: false     # /configure flips this true once filled
+  configured: false     # /agentic-harness:configure flips this true once filled
 
 # Path to the generated business-logic doc (goals, priority order, success
 # criteria — human-readable, derived from the BRD). This is the rubric both
-# /run-manager (task creation) and /architect (task acceptance) check
+# /agentic-harness:run-manager (task creation) and /agentic-harness:architect (task acceptance) check
 # every task against — a task that serves no goal here doesn't get queued
 # without an explicit reason.
 business_logic_doc: docs/business-logic.md
@@ -19,18 +19,18 @@ business_logic_doc: docs/business-logic.md
 # Durable task log — single source of truth for what's done/pending.
 task_log: TASK_LOG.md
 
-# Engineering conventions /architect enforces on every task before marking
+# Engineering conventions /agentic-harness:architect enforces on every task before marking
 # it done — see docs/engineering-standards.md for the actual rules.
 architecture:
   standards_doc: docs/engineering-standards.md
 
-  # Codebase segments. /architect owns this list: it categorizes the
+  # Codebase segments. /agentic-harness:architect owns this list: it categorizes the
   # project into segments (by responsibility, not by file type), creates a
   # scoped subagent per segment under .claude/agents/, and re-segments as
   # new areas of the codebase appear. Each segment agent only ever touches
   # its own owns_paths — cross-segment edits need architect sign-off.
   #
-  # This starts empty for a brand-new project; /architect fills it in the
+  # This starts empty for a brand-new project; /agentic-harness:architect fills it in the
   # first time it runs against real code (nothing to segment before code
   # exists).
   segments: []
@@ -43,15 +43,15 @@ architecture:
 
   # Standing, cross-cutting agent — not a codebase segment, doesn't own any
   # paths. Architect dispatches it after every implementation (segment-agent
-  # or architect-direct) to write that change's tests. Ships as a ready-made
-  # template at .claude/agents/test-writer.md; architect doesn't author it
-  # per project the way it does segment agents. Deliberately separate from
-  # whichever agent wrote the implementation — it doesn't grade its own work.
+  # or architect-direct) to write that change's tests. Shipped by the
+  # agentic-harness plugin itself, not authored per project the way segment
+  # agents are. Deliberately separate from whichever agent wrote the
+  # implementation — it doesn't grade its own work.
   test_agent:
-    agent: test-writer   # matches .claude/agents/test-writer.md's `name:` frontmatter
+    agent: agentic-harness:test-writer   # Agent tool subagent_type
 
 # --- Manager agent -----------------------------------------------------
-# /run-manager reads this. business_goals is priority-ordered (index 0 =
+# /agentic-harness:run-manager reads this. business_goals is priority-ordered (index 0 =
 # highest priority), matching docs/business-logic.md's "Goals (priority
 # order)" section — the two must stay in sync. analysis_command is
 # whatever project-specific script/check produces the data the manager

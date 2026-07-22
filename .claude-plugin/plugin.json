@@ -1,0 +1,13 @@
+{
+  "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
+  "name": "agentic-harness",
+  "version": "0.1.0",
+  "description": "Manager + architect agentic dev workflow: a manager agent that owns business goals, a senior-engineer architect that segments the codebase and staffs a scoped subagent per segment, a durable test-gated TASK_LOG, and optional mirroring to external trackers (ClickUp, etc).",
+  "author": {
+    "name": "Kabin",
+    "email": "kanchon@polygontech.xyz"
+  },
+  "homepage": "https://github.com/kabinh07/agentic-harness",
+  "repository": "https://github.com/kabinh07/agentic-harness",
+  "keywords": ["orchestration", "agents", "project-management", "workflow"]
+}
