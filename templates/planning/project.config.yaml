@@ -1,0 +1,129 @@
+# Project configuration — single source of truth for tools, IDs, business-goal
+# priorities, planning-phase status, and codebase segmentation. Lives inside
+# planning/ alongside every other planning artifact so the whole bundle is one
+# shareable folder. Filled in by the planning-phase commands
+# (/agentic-harness:plan, :brd, :srs, :design, :features, :adr, :epics) and
+# /agentic-harness:configure, then kept current by /agentic-harness:architect
+# as the codebase grows. Everything here is read by CLAUDE.md,
+# /agentic-harness:architect, /agentic-harness:manager, and any tool-mirror
+# skill (e.g. clickup-log) before they do anything else.
+
+project:
+  name: ""              # short project name
+  description: ""       # one-line what/why
+  configured: false     # /agentic-harness:configure flips this true once filled
+
+# --- Planning phase ------------------------------------------------------
+# Owned by /agentic-harness:plan and the stage commands it drives. entry_point
+# is set once, on the first /agentic-harness:plan run, from what actually
+# exists (a bare idea, an existing codebase, an existing BRD, an existing
+# SRS) — never guessed silently. has_ui/design_source gate the design stage;
+# has_ui: null means unasked, false means the design stage is skipped
+# entirely (design.md never written), "later" means ask again next run.
+planning:
+  dir: planning
+  entry_point: ""       # idea | existing-project | brd | srs
+  has_ui: null           # true | false | "later"
+  design_source: ""      # claude-design | stitch | figma | none
+  # status: pending | draft | in-review | approved | skipped
+  # artifact: path relative to the project root (not to planning/), so any
+  # tool reading this config doesn't have to prefix planning/ itself.
+  stages:
+    brd:      { status: pending, artifact: planning/BRD.md,      approved_on: "" }
+    srs:      { status: pending, artifact: planning/SRS.md,      approved_on: "" }
+    design:   { status: pending, artifact: planning/DESIGN.md,   approved_on: "" }
+    features: { status: pending, artifact: planning/FEATURES.md, approved_on: "" }
+    adr:      { status: pending, artifact: planning/adr/,        approved_on: "" }
+    epics:    { status: pending, artifact: planning/EPICS.md,    approved_on: "" }
+
+# Path to the generated business goals doc (goals, priority order, success
+# criteria — human-readable, derived from the BRD). This is the rubric both
+# /agentic-harness:manager (task creation) and /agentic-harness:architect
+# (task acceptance) check every task against — a task that serves no goal
+# here doesn't get queued without an explicit reason.
+business_logic_doc: planning/BUSINESS_GOALS.md
+
+# Durable task log — single source of truth for what's done/pending. Lives at
+# the project root (alongside CLAUDE.md), not inside planning/ — it's living
+# execution state, not a planning artifact.
+task_log: TASKS.md
+
+# Engineering conventions /agentic-harness:architect enforces on every task
+# before marking it done — see planning/ENGINEERING_STANDARDS.md for the
+# actual rules.
+architecture:
+  standards_doc: planning/ENGINEERING_STANDARDS.md
+
+  # Codebase segments. /agentic-harness:architect owns this list: it
+  # categorizes the project into segments (by responsibility, not by file
+  # type), creates a scoped subagent per segment under .claude/agents/, and
+  # re-segments as new areas of the codebase appear — removing a segment's
+  # agent and this entry when its owns_paths no longer exist or it merges
+  # into another segment. Each segment agent only ever touches its own
+  # owns_paths — cross-segment edits need architect sign-off.
+  #
+  # This starts empty for a brand-new project; /agentic-harness:configure
+  # seeds a first pass from planning/FEATURES.md's "proposed owning area"
+  # field if the planning phase ran, otherwise /agentic-harness:architect
+  # fills it in the first time it runs against real code.
+  segments: []
+  # - name: "solver-core"
+  #   description: "ALNS operators, VRP constraints, clustering logic"
+  #   owns_paths: ["solver/operators/", "solver/dataset/state.py"]
+  #   agent: solver-core                 # matches .claude/agents/solver-core.md's `name:` frontmatter
+  #   trigger: "ALNS bug, operator logic, constraint violation, clustering"
+  #   test_command: "python -m pytest unit_tests/test_state.py unit_tests/test_operators.py -q"
+
+  # Standing, cross-cutting agent — not a codebase segment, doesn't own any
+  # paths. Architect dispatches it after every implementation (segment-agent
+  # or architect-direct) to write that change's tests; also invocable
+  # directly via /agentic-harness:test. Shipped by the agentic-harness
+  # plugin itself, not authored per project the way segment agents are.
+  # Deliberately separate from whichever agent wrote the implementation —
+  # it doesn't grade its own work.
+  test_agent:
+    agent: agentic-harness:test-writer   # Agent tool subagent_type
+
+  # Temporary, named groups of segment agents architect dispatches together
+  # in parallel on one task that legitimately spans segments — each member
+  # still bounded to its own owns_paths (a swarm coordinates, it never
+  # merges boundaries). Architect adds an entry when it forms a swarm and
+  # removes it once the task closes; this list should be empty between runs.
+  swarms: []
+  # - name: "checkout-redesign"
+  #   members: ["solver-core", "api-layer"]
+  #   task: "TASKS.md row #14"
+  #   formed_on: "2026-07-30"
+
+# --- Manager agent -----------------------------------------------------
+# /agentic-harness:manager reads this. business_goals is priority-ordered
+# (index 0 = highest priority), matching planning/BUSINESS_GOALS.md's "Goals
+# (priority order)" section — the two must stay in sync. analysis_command is
+# whatever project-specific script/check produces the data the manager
+# agent evaluates against those goals (a test suite, a report generator,
+# a benchmark script) — leave blank until the project has one.
+manager:
+  business_goals: []
+  # - "All X assigned/completed — zero-miss is the target"
+  # - "Minimize resource Y used"
+  analysis_command: ""      # e.g. "python scripts/manager_analysis.py --report output/manager_report.json"
+  report_path: ""           # where analysis_command writes its output, if any
+  severity_thresholds: {}   # optional: metric -> {warning, fail} pairs
+
+# --- External tool mirrors ----------------------------------------------
+# Enable and fill only the tools this project actually uses. Each
+# tool-mirror skill (e.g. clickup-log.md) reads its own block here instead
+# of hardcoding IDs, so the skill file itself never needs project-specific
+# edits.
+tools:
+  clickup:
+    enabled: false
+    parent_task_id: ""     # ClickUp task that all TASKS.md rows mirror under, as subtasks
+    list_id: ""
+    mirror_from_date: ""   # ISO date; rows before this are never backfilled
+  github:
+    enabled: false
+    repo: ""                # owner/repo
+  slack:
+    enabled: false
+    channel: ""

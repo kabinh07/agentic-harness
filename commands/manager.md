@@ -1,33 +1,33 @@
 ---
-name: run-manager
-description: Run the manager agent — analyse project state against docs/business-logic.md goals and write new tasks to TASK_LOG.md
+name: manager
+description: Run the manager agent — analyse project state against planning/BUSINESS_GOALS.md goals and write new tasks to TASKS.md
 ---
 
-# /agentic-harness:run-manager
+# /agentic-harness:manager
 
 Analyses project state against the priority-ordered business goals in
-`docs/business-logic.md` (mirrored, condensed, in `config/project.config.yaml`'s
-`manager.business_goals`). Writes tasks to `TASK_LOG.md`, each one tagged
-with the exact goal it serves — this file is the guardrail that keeps
-task creation tied to the BRD instead of drifting into whatever seems
-locally interesting. Never fixes anything itself — it queues work for
-`/agentic-harness:architect`, which segments, dispatches, and gates it.
+`planning/BUSINESS_GOALS.md` (mirrored, condensed, in
+`planning/project.config.yaml`'s `manager.business_goals`). Writes tasks to
+`TASKS.md`, each one tagged with the exact goal it serves — this file is the
+guardrail that keeps task creation tied to the BRD instead of drifting into
+whatever seems locally interesting. Never fixes anything itself — it queues
+work for `/agentic-harness:architect`, which segments, dispatches, and gates it.
 
 ## Usage
 
 ```
-/agentic-harness:run-manager
-/agentic-harness:run-manager --run-analysis    # run config.manager.analysis_command first, then analyse
+/agentic-harness:manager
+/agentic-harness:manager --run-analysis    # run config.manager.analysis_command first, then analyse
 ```
 
 ## Steps
 
 ### Step 0 — Preconditions
 If `config.project.configured` is `false`, stop — tell the user to run
-`/agentic-harness:configure` first. If `config.manager.analysis_command` is blank, this
-project has no analysis tooling yet; say so and stop (don't invent a
-substitute check) unless the user gives you something concrete to run
-instead.
+`/agentic-harness:plan` or `/agentic-harness:configure` first. If
+`config.manager.analysis_command` is blank, this project has no analysis
+tooling yet; say so and stop (don't invent a substitute check) unless the
+user gives you something concrete to run instead.
 
 ### Step 1 — Optionally run analysis
 If `--run-analysis` passed: run `config.manager.analysis_command` verbatim.
@@ -37,17 +37,17 @@ Read whatever `config.manager.report_path` points to (or the analysis
 command's stdout, if it doesn't write a file). Extract whatever metrics
 exist — don't assume a fixed schema; this varies per project.
 
-### Step 3 — Read `docs/business-logic.md`
+### Step 3 — Read `planning/BUSINESS_GOALS.md`
 This is the rubric. Walk `manager.business_goals` in priority order and
 judge the analysis result against each goal in turn, top priority first.
 
-### Step 4 — Read `TASK_LOG.md`
+### Step 4 — Read `TASKS.md`
 Avoid duplicate tasks — check open ⏳/🔄 rows before adding a new one for
 the same issue.
 
 ### Step 5 — Append new tasks
 Only add 🔴/🟡 tasks (see Severity below). Every row must name the exact
-goal (from `docs/business-logic.md`) the task closes the gap on — if a
+goal (from `planning/BUSINESS_GOALS.md`) the task closes the gap on — if a
 finding doesn't trace to any documented goal, it's not a task, it's an
 observation; note it in the run report instead of queuing it. Format:
 `| N | <task with specifics> | <goal it serves> | Manager YYYY-MM-DD | 🔴/🟡 | ⏳ TODO | <agent segment, or — if unstaffed> | — | — |`
@@ -78,10 +78,10 @@ Top issues: ...
 Project-specific severity thresholds live in
 `config.manager.severity_thresholds` (metric → {warning, fail}), if the
 project has defined any. Absent explicit thresholds, use judgment against
-the priority order in `docs/business-logic.md`: violating goal 1 is always
+the priority order in `planning/BUSINESS_GOALS.md`: violating goal 1 is always
 🔴, violating a lower-priority goal is 🟡 unless it also blocks a
 higher-priority one.
 
 - 🔴 **FAIL**: any top-priority goal violated, or a stated hard constraint/invariant broken.
 - 🟡 **WARNING**: a lower-priority goal under target, or a soft success-criterion missed.
-- 🟢 **OK**: all goals met per `docs/business-logic.md`'s success criteria.
+- 🟢 **OK**: all goals met per `planning/BUSINESS_GOALS.md`'s success criteria.

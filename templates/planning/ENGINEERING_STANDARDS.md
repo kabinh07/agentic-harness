@@ -10,10 +10,11 @@
 - **Tests pass.** A task without a passing test run is not done — no
   exception, no "looks correct to me."
 - **No cross-segment edits without sign-off.** A segment agent only
-  touches its own `owns_paths` (see `config/project.config.yaml`'s
+  touches its own `owns_paths` (see `planning/project.config.yaml`'s
   `architecture.segments`). Needing to touch another segment's files means
   the task was mis-scoped or the segmentation is stale — flag it, don't
-  just do it.
+  just do it. This includes swarms (`architecture.swarms`): a swarm
+  coordinates parallel dispatch on one task, it never merges paths.
 - No dead code, no commented-out blocks, no unused imports/variables left behind.
 
 ## Judgment calls (architect enforces at review time)

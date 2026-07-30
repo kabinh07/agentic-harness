@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "agentic-harness",
-      "description": "Manager agent owns business goals, architect agent segments the codebase and delegates to scoped subagents, TASK_LOG gated on independent tests.",
+      "description": "Idea/BRD/SRS-to-code planning + execution: a planning phase (BRD, SRS, design context, features, ADRs, epics) feeding a manager agent that owns business goals and an architect agent that segments the codebase and delegates to scoped subagents, TASKS.md gated on independent tests.",
       "source": "./",
       "category": "productivity"
     }

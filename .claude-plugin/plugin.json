@@ -1,8 +1,8 @@
 {
   "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
   "name": "agentic-harness",
-  "version": "0.1.0",
-  "description": "Manager + architect agentic dev workflow: a manager agent that owns business goals, a senior-engineer architect that segments the codebase and staffs a scoped subagent per segment, a durable test-gated TASK_LOG, and optional mirroring to external trackers (ClickUp, etc).",
+  "version": "0.2.0",
+  "description": "Idea/BRD/SRS-to-code agentic workflow: a question-driven planning phase (BRD, SRS, design context, features, ADRs, epics) hands off to a manager agent that owns business goals and a senior-engineer architect that segments the codebase, creates and removes scoped subagents (and temporary swarms) per segment, and staffs a standing test-writer. Durable test-gated TASKS.md, optional mirroring to external trackers (ClickUp, etc).",
   "author": {
     "name": "Kabin",
     "email": "kanchon@polygontech.xyz"
