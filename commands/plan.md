@@ -41,9 +41,11 @@ If `planning.entry_point` is already set, skip this phase.
    `/agentic-harness:adr` — they'll dispatch `agentic-harness:codebase-analyst`
    rather than starting from a blank BRD.
 
-## Phase 2 — Shared scope questions (first run only)
+## Phase 2 — Shared scope + calibration questions (first run only)
 
-Ask once, batched in one `AskUserQuestion` call, and record:
+Ask once, batched in one `AskUserQuestion` call (or two if calibration
+needs its own — see `planning-protocol.md`'s cap of 4 questions/call), and
+record:
 - **Has UI?** (yes / no / later) → `planning.has_ui`. `no` means the design
   stage is skipped entirely and never re-asked unless the user later runs
   `/agentic-harness:plan design` themselves. `later` means ask again next run.
@@ -52,6 +54,15 @@ Ask once, batched in one `AskUserQuestion` call, and record:
   yet) → `planning.design_source`. This doesn't block anything; it's
   context `/agentic-harness:design`'s brief mode uses to phrase its output
   usefully.
+- **Knowledge level** → `planning.knowledge_level` (new/working/expert)
+  and **Pressure level** → `planning.pressure_level` (light/standard/hard)
+  — per `planning-protocol.md`'s Calibration section. These set how every
+  later stage's question ladder is paced; don't re-ask per stage. Default
+  working/standard if the user doesn't have a preference.
+
+If `/agentic-harness:brd` gets invoked directly (not via this driver) and
+`planning.knowledge_level`/`pressure_level` are still unset, it runs this
+same calibration itself before starting its ladder — see `brd.md`.
 
 ## Phase 3 — Walk stages
 
@@ -90,8 +101,9 @@ Next: run /agentic-harness:architect to start implementation
 
 `/agentic-harness:plan status` reads `planning.stages` from
 `planning/project.config.yaml` and prints the same table
-`planning/README.md` carries, plus current `entry_point`/`has_ui`/
-`design_source`. Makes no changes.
+`planning/README.md` carries (Stage · Artifact · Version · Status ·
+Approved), plus current `entry_point`/`has_ui`/`design_source`/
+`knowledge_level`/`pressure_level`. Makes no changes.
 
 ## Key invariants
 

@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "agentic-harness",
-      "description": "Idea/BRD/SRS-to-code planning + execution: a planning phase (BRD, SRS, design context, features, ADRs, epics) feeding a manager agent that owns business goals and an architect agent that segments the codebase and delegates to scoped subagents, TASKS.md gated on independent tests.",
+      "description": "Idea/BRD/SRS-to-code planning + execution: a calibrated question-ladder planning phase (versioned, module-ID BRD/SRS/design/features/ADRs/epics) feeding a manager agent that owns business goals and an architect agent that segments the codebase and delegates to scoped subagents, TASKS.md gated on independent tests.",
       "source": "./",
       "category": "productivity"
     }

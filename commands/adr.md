@@ -66,8 +66,14 @@ to check (skip any that don't apply):
    Each option presented, with why it wasn't chosen.
 
    ## Related
-   FR-###, NFR-###, F-##
+   FR-<MODULE>-##, NFR-<CATEGORY>-##, F-##
    ```
+
+   ADRs use Nygard `Status` transitions, not the header-table Version
+   field other artifacts use — that's the versioning mechanism here.
+   Never edit an `Accepted` ADR's Decision in place: if a decision changes,
+   write a new `ADR-NNNN`, mark the old one `Superseded by ADR-NNNN`, and
+   the new one's Context references what changed and why.
 
 ## Existing project — per implicit decision found by codebase-analyst
 

@@ -51,10 +51,14 @@ None of that lives in this repo.
    - `/agentic-harness:features` → `planning/FEATURES.md`
    - `/agentic-harness:adr` → `planning/adr/ADR-NNNN-*.md`
    - `/agentic-harness:epics` → `planning/EPICS.md`, and seeds `TASKS.md`
-3. Every stage asks before writing anything final, and never invents an
-   answer it doesn't have — unresolved items land under that artifact's
-   Assumptions (unvalidated) section instead. `planning/README.md` tracks
-   stage status and open questions for the whole bundle at a glance.
+3. Calibrates once (knowledge/pressure level), then asks through a
+   question ladder before writing anything final — never invents an
+   answer it doesn't have. Unresolved items land under that artifact's
+   Open Items (TBD) section; confirmed background conditions land under
+   Assumptions & Constraints. `planning/README.md` tracks stage status
+   (with each artifact's Version) and open items for the whole bundle at
+   a glance. Every artifact rewrite is archived to `planning/versions/`
+   first — nothing is silently overwritten.
 4. Once `TASKS.md` has seeded rows, run `/agentic-harness:architect` to
    start implementation.
 5. Re-run `/agentic-harness:plan <stage>` any time an earlier artifact

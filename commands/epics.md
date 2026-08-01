@@ -36,8 +36,23 @@ its first run. Follows
 
 ## Output — `planning/EPICS.md`
 
+Follows `planning-protocol.md`'s Document format and Versioning — header
+table with Version/Status, archive-then-write on any rewrite.
+
 ```markdown
 # Epics
+
+## <Project Name>
+
+| | |
+|---|---|
+| **Document title** | <Project Name> — Epics |
+| **Version** | 0.1 (Draft) |
+| **Date** | <today> |
+| **Based on** | FEATURES v<x>, ADRs |
+| **Status** | For review |
+
+---
 
 ## E-01: <name> (→ Goal: <business goal>)
 
@@ -51,9 +66,15 @@ As a <role>, I want <capability>, so that <benefit>.
 **Features:** F-##
 
 #### Tasks
-- [ ] T-01: <implementation-sized task> — traces to S-01/F-##/FR-###/<goal>
+- [ ] T-01: <implementation-sized task> — traces to S-01/F-##/FR-<MODULE>-##/<goal>
 
 (repeat per epic/story)
+
+## Open Items (TBD)
+1. <unresolved item> (§<epic/story it affects>)
+
+---
+*End of document — Draft v0.1. Open items: <1-line summary, or "none">.*
 ```
 
 ## Seed `TASKS.md`
@@ -78,14 +99,14 @@ For every T-## above, append a row using the existing schema:
 
 ## Approval gate
 
-Per `planning-protocol.md`, applied to the epic/story/task backlog as a
-whole. On approval, set `planning.stages.epics.status: approved` +
-`approved_on`.
+Per `planning-protocol.md` (Versioning applies — archive before rewrite),
+applied to the epic/story/task backlog as a whole. On approval, set
+`planning.stages.epics.status: approved` + `approved_on`.
 
 ## Report (≤8 lines)
 
 ```
-planning/EPICS.md: N epics, N stories, N tasks
+planning/EPICS.md: v<version> — N epics, N stories, N tasks
 TASKS.md: N rows seeded
 Traceability: all tasks trace to a goal (or list exceptions)
 Status: draft/approved

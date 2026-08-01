@@ -24,10 +24,13 @@ inventory helps group FRs into user-facing features).
 
 ## Process
 
+0. Follows `planning-protocol.md`'s Document format and Versioning —
+   header table with Version/Status, archive-then-write on any rewrite.
 1. Group FRs into features — a feature is a discrete, user/system-facing
    capability exercisable end-to-end, not a single FR in isolation and not
    an entire epic-sized area. ("OAuth login via Google," not "auth" and
-   not "click login button.")
+   not "click login button.") A feature usually stays within one BRD/SRS
+   module, but note when it genuinely spans more than one.
 2. For each feature, ask/derive:
    - Complexity: S/M/L/XL (rough sizing, not an estimate in hours).
    - MoSCoW priority: Must/Should/Could/Won't (this round).
@@ -55,10 +58,22 @@ inventory helps group FRs into user-facing features).
 ```markdown
 # Features
 
+## <Project Name>
+
+| | |
+|---|---|
+| **Document title** | <Project Name> — Features |
+| **Version** | 0.1 (Draft) |
+| **Date** | <today> |
+| **Based on** | SRS v<x> |
+| **Status** | For review |
+
+---
+
 ## F-01: <name>
 - **Description:**
 - **User value:**
-- **Requirements:** FR-###, NFR-### (...)
+- **Requirements:** FR-<MODULE>-##, NFR-<MODULE>-## (...)
 - **Dependencies:** F-##, ...
 - **Complexity:** S/M/L/XL
 - **Priority:** Must/Should/Could/Won't
@@ -83,22 +98,26 @@ graph TD
 - FRs with no feature: ...
 - Features with no FR/NFR: ...
 
-## Assumptions (unvalidated)
-## Open Questions
+## Assumptions & Constraints
+## Open Items (TBD)
+1. <unresolved item> (§<section>)
+
+---
+*End of document — Draft v0.1. Open items: <1-line summary, or "none">.*
 ```
 
 ## Approval gate
 
-Per `planning-protocol.md`. On approval, set
-`planning.stages.features.status: approved` + `approved_on`.
+Per `planning-protocol.md` (Versioning applies — archive before rewrite).
+On approval, set `planning.stages.features.status: approved` + `approved_on`.
 
 ## Report (≤6 lines)
 
 ```
-planning/FEATURES.md: <written/updated>
+planning/FEATURES.md: v<version> (<written/updated>)
 Features: N (MVP: N)
 Orphans: FR->feature N, feature->FR N (or "none")
-Open questions: N
+Open items: N
 Status: draft/approved
 Next: /agentic-harness:adr
 ```

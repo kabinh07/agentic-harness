@@ -25,15 +25,22 @@ the most recently modified as authoritative if they conflict, and flag the
 conflict to the user rather than silently picking.
 
 ### Step 2 — Extract from the BRD
-Read the BRD fully. Pull out:
-- **Project name/description** — one line each.
-- **Business goals, in priority order.** If the BRD doesn't state an
-  explicit order, infer one from emphasis/repetition/"must have" vs.
-  "nice to have" language, and flag the inferred order to the user for
-  confirmation rather than asserting it silently.
-- **Success criteria / metrics** — anything measurable (e.g. "95% on-time",
-  "zero data loss", "under 2s response").
-- **Constraints / invariants** — hard rules the solution must never violate.
+Read the BRD fully (see `planning-protocol.md`'s Document format — §3
+Business Objectives, §6 Functional Requirements grouped by module with
+M/S/C priority, §7 NFRs, §8 Assumptions & Constraints). Pull out:
+- **Project name/description** — one line each, from the header table /
+  §1 Purpose.
+- **Business goals, in priority order.** Start from §3's Business
+  Objectives (bulleted, in the order stated); cross-check against which
+  modules carry mostly **M**-priority requirements in §6 vs. mostly
+  **S**/**C** — a module that's all Should/Could-have is a lower-priority
+  goal even if §3 didn't rank it explicitly. Flag any inferred ordering to
+  the user for confirmation rather than asserting it silently.
+- **Success criteria / metrics** — anything measurable in §3 or the
+  requirement rows themselves (e.g. "95% on-time," "zero data loss,"
+  "under 2s response").
+- **Constraints / invariants** — §8 Assumptions & Constraints, plus §4.2
+  Out of scope (what's explicitly excluded is itself a constraint).
 - **Tools/systems mentioned** — ClickUp, Jira, GitHub, Slack, a specific
   API, a database, etc. Note only what's *mentioned*; don't assume a tool
   is wanted just because it's common.
@@ -66,17 +73,20 @@ what `/agentic-harness:manager` uses as its rubric.
 If `planning/FEATURES.md` already exists (the planning phase reached the
 features stage before this ran), seed one `architecture.segments` entry per
 feature's "proposed owning area" — group features that named the same area
-into one segment. Otherwise, if the BRD names distinct components/subsystems
-(e.g. "a scraper, a scoring engine, a dashboard"), seed one entry per
-component instead. Either way: `name`, `description`, `trigger` (what kind
-of task routes here). Leave `owns_paths`, `agent`, and `test_command`
+into one segment. Otherwise, seed one entry per **BRD §6 module**
+(e.g. `FR-RUNTIME-*`, `FR-TOOL-*`, `FR-AUTH-*` — whatever modules this
+BRD actually defined → one segment candidate per module prefix)
+— this is usually a better starting signal than free-form component
+naming, since the module boundaries were already chosen deliberately for
+the requirement IDs. Either way: `name`, `description`, `trigger` (what
+kind of task routes here). Leave `owns_paths`, `agent`, and `test_command`
 blank — there's no code yet to own paths or a test command to run.
 `/agentic-harness:architect` fills those in and creates the actual
 `.claude/agents/<segment>.md` subagent the first time it runs against real
-code (see `architect.md` Phase 1.5). If neither source names real
-components yet, leave `segments: []` — don't invent a breakdown from
-nothing; that's `/agentic-harness:architect`'s job once there's code to
-look at.
+code (see `architect.md` Phase 1.5). If the BRD has only one module or is
+too abstract to name real components yet, leave `segments: []` — don't
+invent a breakdown from nothing; that's `/agentic-harness:architect`'s job
+once there's code to look at.
 
 ### Step 6 — Confirm `planning/ENGINEERING_STANDARDS.md`
 The generic defaults ship as-is. Only add to "Project-specific additions"
@@ -102,9 +112,10 @@ anywhere, clean it up, but the file's job is to point at config, not
 duplicate it.
 
 ### Step 9 — Update `planning/project.config.yaml`'s stage status
-Set `planning.stages.brd.status: approved` (with today's `approved_on`) if
-this ran from an approved `planning/BRD.md` — `/agentic-harness:configure`
-doesn't gate on this itself, but keeps the record consistent for
+Set `planning.stages.brd.status: approved` (with today's `approved_on` and
+`version` matching the BRD header table's current Version) if this ran
+from an approved `planning/BRD.md` — `/agentic-harness:configure` doesn't
+gate on this itself, but keeps the record consistent for
 `/agentic-harness:plan` and `planning/README.md`.
 
 ### Step 10 — Report (≤10 lines)

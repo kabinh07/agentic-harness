@@ -41,17 +41,19 @@ flowchart TD
 
 | Stage | Command | Artifact | Traces to |
 |---|---|---|---|
-| BRD | `/agentic-harness:brd` | `planning/BRD.md` | (root) |
+| BRD | `/agentic-harness:brd` | `planning/BRD.md` (`FR-<MODULE>-##`) | (root) |
 | Goals extraction | `/agentic-harness:configure` | `planning/BUSINESS_GOALS.md`, `planning/project.config.yaml` | BRD |
-| SRS | `/agentic-harness:srs` | `planning/SRS.md` (FR-###/NFR-###) | BRD goals |
+| SRS | `/agentic-harness:srs` | `planning/SRS.md` (same `FR-<MODULE>-##` IDs, elaborated; `NFR-<CATEGORY>-##`) | BRD |
 | Design (optional) | `/agentic-harness:design` | `planning/DESIGN_BRIEF.md` then `planning/DESIGN.md` | SRS |
 | Features | `/agentic-harness:features` | `planning/FEATURES.md` (F-##) | SRS FR/NFR |
 | ADRs | `/agentic-harness:adr` | `planning/adr/ADR-NNNN-*.md` | Features/SRS |
 | Epics | `/agentic-harness:epics` | `planning/EPICS.md` (E-##/S-##/T-##), seeds `TASKS.md` | Features → Goals |
 
-Every artifact after the BRD carries a trace back up this chain — see
-`planning-protocol.md`'s Traceability section for the exact rule each stage
-enforces (orphan checks, goal citations, etc.).
+Every artifact after the BRD carries a trace back up this chain by ID —
+see `planning-protocol.md`'s Traceability section for the exact rule each
+stage enforces (orphan checks, the SRS's Appendix A matrix, etc.), and its
+Document format / Versioning sections for the header-table + archive
+convention every artifact follows.
 
 ## Entry points
 

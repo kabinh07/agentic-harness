@@ -25,8 +25,11 @@ command creates them.
    - `${CLAUDE_PLUGIN_ROOT}/templates/planning/input/.gitkeep` → `planning/input/.gitkeep`
    - `${CLAUDE_PLUGIN_ROOT}/templates/planning/adr/.gitkeep` → `planning/adr/.gitkeep`
    - `${CLAUDE_PLUGIN_ROOT}/templates/planning/design-assets/.gitkeep` → `planning/design-assets/.gitkeep`
+   - `${CLAUDE_PLUGIN_ROOT}/templates/planning/versions/.gitkeep` → `planning/versions/.gitkeep`
+     (the append-only archive every artifact rewrite copies into — see
+     `planning-protocol.md`'s Versioning section)
 2. Create missing parent directories (`planning/`, `planning/input/`,
-   `planning/adr/`, `planning/design-assets/`) as needed. Do not create
+   `planning/adr/`, `planning/design-assets/`, `planning/versions/`) as needed. Do not create
    `planning/BRD.md`, `planning/SRS.md`, etc. — those are written by the
    planning-phase stage commands, not scaffolded empty.
 3. If `CLAUDE.md` already existed in the project and doesn't reference this

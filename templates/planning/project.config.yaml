@@ -22,19 +22,30 @@ project:
 # entirely (design.md never written), "later" means ask again next run.
 planning:
   dir: planning
+  versions_dir: planning/versions   # append-only archive; every artifact
+    # rewrite copies the current file here first, per planning-protocol.md's
+    # Versioning section — never delete from this directory.
   entry_point: ""       # idea | existing-project | brd | srs
   has_ui: null           # true | false | "later"
   design_source: ""      # claude-design | stitch | figma | none
+  # Calibration (planning-protocol.md), asked once per session, reused by
+  # every stage. knowledge_level: new | working | expert (default working).
+  # pressure_level: light | standard | hard (default standard). User can
+  # change either mid-session ("softer", "harder", "teach more").
+  knowledge_level: ""
+  pressure_level: ""
   # status: pending | draft | in-review | approved | skipped
   # artifact: path relative to the project root (not to planning/), so any
   # tool reading this config doesn't have to prefix planning/ itself.
+  # version: mirrors the artifact's own header-table Version field — kept
+  # here too so /agentic-harness:plan status doesn't have to open every file.
   stages:
-    brd:      { status: pending, artifact: planning/BRD.md,      approved_on: "" }
-    srs:      { status: pending, artifact: planning/SRS.md,      approved_on: "" }
-    design:   { status: pending, artifact: planning/DESIGN.md,   approved_on: "" }
-    features: { status: pending, artifact: planning/FEATURES.md, approved_on: "" }
-    adr:      { status: pending, artifact: planning/adr/,        approved_on: "" }
-    epics:    { status: pending, artifact: planning/EPICS.md,    approved_on: "" }
+    brd:      { status: pending, artifact: planning/BRD.md,      version: "", approved_on: "" }
+    srs:      { status: pending, artifact: planning/SRS.md,      version: "", approved_on: "" }
+    design:   { status: pending, artifact: planning/DESIGN.md,   version: "", approved_on: "" }
+    features: { status: pending, artifact: planning/FEATURES.md, version: "", approved_on: "" }
+    adr:      { status: pending, artifact: planning/adr/,        version: "", approved_on: "" }
+    epics:    { status: pending, artifact: planning/EPICS.md,    version: "", approved_on: "" }
 
 # Path to the generated business goals doc (goals, priority order, success
 # criteria — human-readable, derived from the BRD). This is the rubric both
