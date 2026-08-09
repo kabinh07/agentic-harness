@@ -34,6 +34,16 @@ planning:
   # change either mid-session ("softer", "harder", "teach more").
   knowledge_level: ""
   pressure_level: ""
+  # Decided once, at /agentic-harness:epics (Process step 6) — never mixed
+  # mid-backlog. single_batch: epics/tasks sequenced by WSJF, no calendar
+  # boxing. sprint_weekly: Monday-Sunday weekly sprints; sprints below,
+  # Sprint 1 committed, later sprints provisional until their boundary.
+  delivery_mode: ""     # single_batch | sprint_weekly
+  sprints: []            # only used when delivery_mode: sprint_weekly
+  # - number: 1
+  #   week_of: "2026-08-10"      # Monday of that week
+  #   epics: ["E-01"]
+  #   status: planned            # planned | active | done
   # status: pending | draft | in-review | approved | skipped
   # artifact: path relative to the project root (not to planning/), so any
   # tool reading this config doesn't have to prefix planning/ itself.

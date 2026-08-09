@@ -58,7 +58,11 @@ not a prose memo. Structure:
     the module name doesn't grant an exception.
 - **Priority** uses **M** (Must-have) / **S** (Should-have) / **C**
   (Could-have) — not "high/medium/low," not must/should/could spelled out
-  in the table (the letter is the convention).
+  in the table (the letter is the convention). At epic level,
+  `/agentic-harness:epics` additionally scores with **WSJF** —
+  `(business_value + time_criticality + risk_reduction) / job_size`, each
+  1–10 — since ordering *epics* against each other needs a size-weighted
+  score, not just a M/S/C bucket; tasks inside an epic stay M/S/C.
 - **IDs are inherited, not reinvented, downstream.** SRS elaborates the
   same `FR-<MODULE>-##` IDs the BRD introduced for that module, continuing
   each module's own sequence for SRS-only additions. A requirement's ID
@@ -116,6 +120,24 @@ database/ORM/queue/library that implements it is not.
 writes the right column under the same ID. A BRD reviewer who hits the
 right column's level of detail should push back — that's a signal the
 document needs a rewrite at the correct altitude, not a nitpick.
+
+## Acceptance criteria format (EARS)
+
+`/agentic-harness:epics` states every epic's acceptance criteria in EARS
+(Easy Approach to Requirements Syntax) — one behavior per line, keyed so a
+later test can be named after it:
+
+- **WHEN** `<trigger>`, the system **SHALL** `<behavior>`.
+- **IF** `<error/edge condition>`, **THEN** the system **SHALL** `<response>`.
+
+ID each line `EARS-<AREA>-#` (area = a short tag for the epic's slice of the
+system, e.g. `AUTH`, `NOTIF`) and cite the FR/UC id it traces to in
+parentheses. Cross-cutting NFRs (security, performance, availability) bind
+as EARS lines on whichever epic they constrain — never a separate "NFR
+epic," which is how NFRs quietly never get built. EARS lines are the
+contract a test is later written against; a criterion that can't be
+phrased as WHEN/IF...SHALL is usually still vague, not yet a real
+acceptance criterion.
 
 ## Versioning
 
@@ -282,8 +304,8 @@ it must always reflect reality without them having to open every artifact.
 
 Every artifact after the BRD should be able to point back up the chain:
 SRS requirement → BRD requirement (same ID, elaborated); Feature → SRS
-requirement(s); ADR → Feature/SRS requirement(s) it enables; Epic/Story/
-Task → Feature → SRS requirement → BRD requirement. A stage command that
+requirement(s); ADR → Feature/SRS requirement(s) it enables; Epic/Task →
+Feature → SRS requirement → BRD requirement. A stage command that
 finds an item with no upstream trace reports it as an orphan rather than
 silently keeping or dropping it — see each stage's own orphan-check step
 and the SRS's Appendix A traceability matrix.

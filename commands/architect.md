@@ -24,6 +24,7 @@ file never needs project-specific edits.
 /agentic-harness:architect <user request>     # plan + execute
 /agentic-harness:architect status             # show TASKS.md without executing
 /agentic-harness:architect resegment          # force a re-scan of architecture.segments
+/agentic-harness:architect all sprints        # sprint_weekly only: run every sprint's TODO tasks, not just the active one
 ```
 
 ## Phase 0 — Preconditions
@@ -35,7 +36,14 @@ if a BRD already exists) first.
 ## Phase 1 — Orient
 
 1. Read `TASKS.md`. Know TODO / IN_PROGRESS / DONE / BLOCKED. Never restart DONE.
-2. **from-manager / no args**: execute all ⏳ TODO tasks.
+2. **from-manager / no args**: execute all ⏳ TODO tasks. **Exception:** if
+   `planning/project.config.yaml`'s `planning.delivery_mode` is
+   `sprint_weekly`, default to the ⏳ TODO tasks whose `Sprint` column
+   matches the `planning.sprints` entry with `status: active` instead of
+   the whole backlog — a sprint is a commitment to *that* scope, not
+   license to pull ahead. Run every sprint's TODO tasks anyway only if the
+   user explicitly says so (e.g. `all sprints`). If no sprint is `active`
+   yet, flag it and ask before executing anything.
    **user request**: produce new tasks, add to TASKS.md.
    **status**: print Active Tasks table and stop.
    **resegment**: run Phase 1.5 only, report the diff, stop.
@@ -133,8 +141,8 @@ named swarm instead of forcing one agent outside its bounds:
 7. **Goal check**: every task must cite which `planning/BUSINESS_GOALS.md`
    goal it serves (`Goal` column in TASKS.md) — if the task came from the
    planning phase, this may be the fuller trace chain
-   Task→Story→Epic→Feature→FR→Goal (see `planning/EPICS.md`), condensed to
-   the `[F-##/S-##]` tag plus the goal string. A task with no goal
+   Task→Epic→Feature→FR→Goal (see `planning/EPICS.md`), condensed to
+   the `[E-##/F-##]` tag plus the goal string. A task with no goal
    doesn't get queued silently — either find the goal it actually serves,
    mark it explicitly as infra/tooling (allowed, but labeled), or drop it.
 8. Write to TASKS.md first — all new tasks get ⏳ TODO, with Goal and
@@ -203,6 +211,13 @@ f. TASKS.md → ✅ DONE only once c, d, and e all pass, record Completed.
 
 Run the project's full test suite (not just the touched segments') before
 closing out the run. Update TASKS.md. Report ≤8 lines.
+
+If `planning.delivery_mode` is `sprint_weekly` and every task in the active
+sprint is ✅ DONE (or explicitly deferred, never silently dropped), flip
+that sprint's `status` to `done` in `planning/project.config.yaml` and flag
+to the user that the next sprint's scope needs confirming (its epics were
+only provisional at planning time) — don't auto-activate it without that
+confirmation.
 
 ## Key invariants
 

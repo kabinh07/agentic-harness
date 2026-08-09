@@ -18,6 +18,13 @@ Knowledge level: — · Pressure level: — *(set once, on the first
 `/agentic-harness:plan` or `/agentic-harness:brd` run — see
 `planning-protocol.md`)*
 
+## Delivery
+
+Mode: — *(set once, at `/agentic-harness:epics` — whole project at once or
+weekly sprints)*. Current sprint: — *(sprint_weekly only; see
+`planning/project.config.yaml`'s `planning.sprints` and `EPICS.md`'s
+Delivery plan section)*
+
 ## Stage status
 
 | Stage | Artifact | Version | Status | Approved |

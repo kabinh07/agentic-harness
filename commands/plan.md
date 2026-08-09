@@ -92,6 +92,7 @@ Once `epics` reaches `approved` (or the user stops the walk early), report:
 
 ```
 Planning phase: <N>/6 stages approved (<list any skipped/pending>)
+Delivery mode: whole project at once | weekly sprints (Sprint 1: <epics>) | not yet decided
 TASKS.md: <N> rows seeded (or "not yet — epics stage still pending")
 planning/README.md: up to date
 Next: run /agentic-harness:architect to start implementation
@@ -103,7 +104,8 @@ Next: run /agentic-harness:architect to start implementation
 `planning/project.config.yaml` and prints the same table
 `planning/README.md` carries (Stage · Artifact · Version · Status ·
 Approved), plus current `entry_point`/`has_ui`/`design_source`/
-`knowledge_level`/`pressure_level`. Makes no changes.
+`knowledge_level`/`pressure_level`/`delivery_mode` (and, if
+`sprint_weekly`, the current sprint and its status). Makes no changes.
 
 ## Key invariants
 

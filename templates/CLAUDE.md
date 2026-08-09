@@ -50,7 +50,10 @@ None of that lives in this repo.
      `planning/DESIGN.md` (consistency context, once you've designed)
    - `/agentic-harness:features` → `planning/FEATURES.md`
    - `/agentic-harness:adr` → `planning/adr/ADR-NNNN-*.md`
-   - `/agentic-harness:epics` → `planning/EPICS.md`, and seeds `TASKS.md`
+   - `/agentic-harness:epics` → `planning/EPICS.md` (plain-language epics,
+     EARS acceptance criteria, WSJF-scored, decomposed straight into
+     implementation-sized tasks), decides delivery mode (whole project at
+     once, or committed weekly sprints), and seeds `TASKS.md`
 3. Calibrates once (knowledge/pressure level), then asks through a
    question ladder before writing anything final — never invents an
    answer it doesn't have. Unresolved items land under that artifact's

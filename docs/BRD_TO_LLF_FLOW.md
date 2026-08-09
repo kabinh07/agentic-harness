@@ -11,11 +11,15 @@
 
 Business requirements are not implementation-sized tasks. Standard PM
 practice bridges that gap with a decomposition layer — Epics → Features →
-User Stories → Acceptance Criteria — before anyone writes code. This
-plugin's planning phase implements that layer as six question-driven
-commands, orchestrated by `/agentic-harness:plan`, so `TASKS.md` always
-starts from a real, traceable backlog instead of an empty file or a
-BRD-to-task leap with nothing in between.
+Tasks → Acceptance Criteria — before anyone writes code. This plugin's
+planning phase implements that layer as six question-driven commands,
+orchestrated by `/agentic-harness:plan`, so `TASKS.md` always starts from a
+real, traceable backlog instead of an empty file or a BRD-to-task leap with
+nothing in between. Epics decompose straight into implementation-sized
+tasks (no separate story layer), titled in plain language, scored WSJF,
+and stated as EARS acceptance criteria — see `epics.md`. The final planning
+decision is delivery mode: the whole backlog sequenced by WSJF, or weekly
+sprints with Sprint 1 committed and later sprints provisional.
 
 ## Flow
 
@@ -47,7 +51,7 @@ flowchart TD
 | Design (optional) | `/agentic-harness:design` | `planning/DESIGN_BRIEF.md` then `planning/DESIGN.md` | SRS |
 | Features | `/agentic-harness:features` | `planning/FEATURES.md` (F-##) | SRS FR/NFR |
 | ADRs | `/agentic-harness:adr` | `planning/adr/ADR-NNNN-*.md` | Features/SRS |
-| Epics | `/agentic-harness:epics` | `planning/EPICS.md` (E-##/S-##/T-##), seeds `TASKS.md` | Features → Goals |
+| Epics | `/agentic-harness:epics` | `planning/EPICS.md` (E-##/T-##) + delivery mode, seeds `TASKS.md` | Features → Goals |
 
 Every artifact after the BRD carries a trace back up this chain by ID —
 see `planning-protocol.md`'s Traceability section for the exact rule each

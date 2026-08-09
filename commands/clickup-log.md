@@ -54,8 +54,8 @@ before touching earlier rows.
 
 Rows seeded straight into `TASKS.md` by the planning phase's
 `/agentic-harness:epics` (source `Planning YYYY-MM-DD`) mirror the same as
-any other new row — the `[F-##/S-##]` trace tag in the Task cell travels
-into the ClickUp description alongside the Goal, so the story/feature
+any other new row — the `[E-##/F-##]` trace tag in the Task cell travels
+into the ClickUp description alongside the Goal, so the epic/feature
 context isn't lost on the ClickUp side either.
 
 ## Status mapping (TASKS → ClickUp)

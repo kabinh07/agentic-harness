@@ -2,7 +2,9 @@
 
 A Claude Code plugin for a reusable, end-to-end agentic dev workflow: a
 question-driven **planning phase** (BRD → SRS → design context → features →
-ADRs → epics) that hands off to a **manager** agent owning the business
+ADRs → epics, ending in a delivery-mode call — whole project at once, or
+committed weekly sprints) that hands off to a **manager** agent owning the
+business
 goals and a senior-engineer **architect** agent that segments the codebase,
 creates and removes scoped subagents (and temporary swarms for cross-segment
 work), and staffs a standing test-writer — all gated on a durable `TASKS.md`,
@@ -78,8 +80,11 @@ dispatches any task.
    `TASKS.md` — every row tagged with the exact goal it serves. No goal,
    no task; observations that don't trace to a goal get reported, not
    queued. (`/agentic-harness:epics` seeds the initial backlog the same
-   way, from the planning phase's epics/stories instead of a live analysis.)
-2. **`/agentic-harness:architect`** picks it up. If the codebase has grown
+   way, from the planning phase's epics/tasks instead of a live analysis.)
+2. **`/agentic-harness:architect`** picks it up — if `planning.delivery_mode`
+   is `sprint_weekly`, scoped by default to the active sprint's tasks, not
+   the whole backlog (`/agentic-harness:architect all sprints` overrides
+   this explicitly). If the codebase has grown
    (or shrunk) since the last segmentation, it re-segments first
    (`architecture.segments` in config) — creating subagents for new areas
    **and removing** `.claude/agents/<segment>.md` files for areas that no

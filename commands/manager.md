@@ -50,11 +50,15 @@ Only add 🔴/🟡 tasks (see Severity below). Every row must name the exact
 goal (from `planning/BUSINESS_GOALS.md`) the task closes the gap on — if a
 finding doesn't trace to any documented goal, it's not a task, it's an
 observation; note it in the run report instead of queuing it. Format:
-`| N | <task with specifics> | <goal it serves> | Manager YYYY-MM-DD | 🔴/🟡 | ⏳ TODO | <agent segment, or — if unstaffed> | — | — |`
+`| N | <task with specifics> | <goal it serves> | Manager YYYY-MM-DD | 🔴/🟡 | <sprint, or —> | ⏳ TODO | <agent segment, or — if unstaffed> | — | — |`
 
 Leave the Agent column as `—` if `architecture.segments` doesn't yet have
 a segment covering this task's area — `/agentic-harness:architect` resolves that at
 dispatch time (Phase 1.5), the manager doesn't guess at segmentation.
+
+Sprint column: if `planning.delivery_mode` is `sprint_weekly`, use the
+current active sprint's number (a manager-found gap belongs to now, not a
+future sprint) — otherwise `—`.
 
 For each tool under `config.tools` with `enabled: true`, invoke its
 mirror skill (e.g. `/agentic-harness:clickup-log`) to sync each new row, respecting that
