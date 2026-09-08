@@ -5,7 +5,7 @@ description: Enumerate architecture decisions implied by the SRS/FEATURES, prese
 
 # /agentic-harness:adr
 
-Fifth planning stage. Produces one Architecture Decision Record per
+Seventh planning stage. Produces one Architecture Decision Record per
 significant technical decision the project needs — the record of *why*,
 not just *what*, that `/agentic-harness:architect` and future maintainers
 read before assuming a decision is up for relitigating. Follows
@@ -17,8 +17,9 @@ read before assuming a decision is up for relitigating. Follows
 
 ## Inputs
 
-`planning/SRS.md`, `planning/FEATURES.md`. If
-`planning.entry_point == existing-project`, dispatch
+`planning/SRS.md`, `planning/FEATURES.md`, `planning/DFD.md` §8 Decisions
+this diagram provokes, `planning/ERD.md` §8 Decisions this model provokes
+if it exists. If `planning.entry_point == existing-project`, dispatch
 `agentic-harness:codebase-analyst` for its "Implicit architectural
 decisions" section.
 
@@ -26,15 +27,19 @@ decisions" section.
 
 Enumerate candidate decisions from what the SRS/Features actually imply —
 don't manufacture a decision nobody needs a record for. Typical categories
-to check (skip any that don't apply):
+to check (skip any that don't apply), each annotated with which upstream
+artifact supplies its strongest evidence when that artifact exists:
 
 - Language / framework
-- Datastore(s)
+- Datastore(s) — evidence: ERD §2 entity graph shape, §6 access patterns
 - Auth approach
-- API style (REST/GraphQL/RPC/etc.)
-- Async / queueing, if any workload implies it
-- Deployment / hosting target
-- Multi-tenancy model, if the BRD/SRS implies multiple tenants
+- API style (REST/GraphQL/RPC/etc.) — evidence: ERD §6 read-pattern
+  nesting depth, DFD §2/§6 external-facing flows
+- Async / queueing, if any workload implies it — evidence: DFD §6 flow
+  inventory's Sync/Async column
+- Deployment / hosting target — evidence: DFD §7 trust boundaries
+- Multi-tenancy model, if the BRD/SRS implies multiple tenants —
+  evidence: ERD §1.4 tenancy stance, DFD §5 stores shared across trust zones
 - Testing strategy, if it's non-default for the stack
 - Observability approach
 

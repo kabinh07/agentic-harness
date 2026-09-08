@@ -34,6 +34,8 @@ commands/              # -> /agentic-harness:<name> slash commands
   brd.md                 # -> planning/BRD.md
   srs.md                  # -> planning/SRS.md
   design.md                 # -> planning/DESIGN_BRIEF.md, then planning/DESIGN.md (skippable)
+  dfd.md                      # -> planning/DFD.md (mandatory)
+  erd.md                        # -> planning/ERD.md (skippable)
   features.md                # -> planning/FEATURES.md
   adr.md                       # -> planning/adr/ADR-NNNN-*.md
   epics.md                      # -> planning/EPICS.md, seeds TASKS.md
@@ -47,7 +49,7 @@ agents/
   test-writer.md      # -> agentic-harness:test-writer, standing test author
   codebase-analyst.md  # -> agentic-harness:codebase-analyst, read-only existing-code surveyor
 docs/
-  planning-protocol.md # shared questioning/gating/bookkeeping rules for the six planning commands
+  planning-protocol.md # shared questioning/gating/bookkeeping rules for the eight planning commands
 templates/             # copied into a project by /agentic-harness:init
   CLAUDE.md
   TASKS.md
@@ -59,6 +61,7 @@ templates/             # copied into a project by /agentic-harness:init
     input/.gitkeep
     adr/.gitkeep
     design-assets/.gitkeep
+    versions/.gitkeep
 ```
 
 See `README.md` for install instructions and `templates/CLAUDE.md` for what

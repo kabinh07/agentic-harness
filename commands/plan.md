@@ -1,6 +1,6 @@
 ---
 name: plan
-description: Planning-phase driver — figures out where the project starts (idea, existing codebase, existing BRD, or existing SRS) and walks BRD -> SRS -> design (optional) -> features -> ADRs -> epics, asking whatever it needs and never inventing an answer. Resumable at any stage.
+description: Planning-phase driver — figures out where the project starts (idea, existing codebase, existing BRD, or existing SRS) and walks BRD -> SRS -> design (optional) -> DFD -> ERD (optional) -> features -> ADRs -> epics, asking whatever it needs and never inventing an answer. Resumable at any stage.
 ---
 
 # /agentic-harness:plan
@@ -18,7 +18,7 @@ approval-gate, and bookkeeping rules every stage shares.
 ```
 /agentic-harness:plan                # resume at the first non-approved stage, walk forward
 /agentic-harness:plan status         # print the stage table, stop
-/agentic-harness:plan <stage>        # jump straight to one stage (brd|srs|design|features|adr|epics)
+/agentic-harness:plan <stage>        # jump straight to one stage (brd|srs|design|dfd|erd|features|adr|epics)
 ```
 
 ## Phase 0 — Preconditions
@@ -43,17 +43,29 @@ If `planning.entry_point` is already set, skip this phase.
 
 ## Phase 2 — Shared scope + calibration questions (first run only)
 
-Ask once, batched in one `AskUserQuestion` call (or two if calibration
-needs its own — see `planning-protocol.md`'s cap of 4 questions/call), and
-record:
+Two batched `AskUserQuestion` calls — five questions total now exceeds
+`planning-protocol.md`'s cap of 4 questions/call, so split by topic
+rather than cramming:
+
+**Call 1 (scope):**
 - **Has UI?** (yes / no / later) → `planning.has_ui`. `no` means the design
   stage is skipped entirely and never re-asked unless the user later runs
   `/agentic-harness:plan design` themselves. `later` means ask again next run.
+- **Has a structured data model?** (yes / no / later) → `planning.has_data_model`.
+  `no` means the erd stage is skipped entirely (same re-ask rule as
+  has_ui, via `/agentic-harness:plan erd`). Don't ask blind — if
+  `planning/SRS.md` is already approved, its §4.1 Core Entities is direct
+  evidence; if `entry_point == existing-project`, check
+  `agentic-harness:codebase-analyst`'s Data model section (schema files,
+  migrations, ORM models found → recommend yes, citing the path; none
+  found → recommend no) before presenting the question.
 - **Design source**, only if `has_ui` isn't `no`: which external tool will
   produce the actual design (Claude design / Stitch / Figma / other/none
   yet) → `planning.design_source`. This doesn't block anything; it's
   context `/agentic-harness:design`'s brief mode uses to phrase its output
   usefully.
+
+**Call 2 (calibration):**
 - **Knowledge level** → `planning.knowledge_level` (new/working/expert)
   and **Pressure level** → `planning.pressure_level` (light/standard/hard)
   — per `planning-protocol.md`'s Calibration section. These set how every
@@ -67,8 +79,8 @@ same calibration itself before starting its ladder — see `brd.md`.
 ## Phase 3 — Walk stages
 
 Stage order: `brd` → `configure` (existing command, not part of this file's
-scope beyond invoking it) → `srs` → `design` (skippable) → `features` →
-`adr` → `epics`.
+scope beyond invoking it) → `srs` → `design` (skippable) → `dfd` → `erd`
+(skippable) → `features` → `adr` → `epics`.
 
 For `/agentic-harness:plan` (no stage arg): starting from
 `planning.entry_point`'s natural starting stage (usually `brd`, or `srs` if
@@ -91,7 +103,7 @@ one line and continue to the next unless the user stops you.
 Once `epics` reaches `approved` (or the user stops the walk early), report:
 
 ```
-Planning phase: <N>/6 stages approved (<list any skipped/pending>)
+Planning phase: <N>/8 stages approved (<list any skipped/pending>)
 Delivery mode: whole project at once | weekly sprints (Sprint 1: <epics>) | not yet decided
 TASKS.md: <N> rows seeded (or "not yet — epics stage still pending")
 planning/README.md: up to date
@@ -104,13 +116,14 @@ Next: run /agentic-harness:architect to start implementation
 `planning/project.config.yaml` and prints the same table
 `planning/README.md` carries (Stage · Artifact · Version · Status ·
 Approved), plus current `entry_point`/`has_ui`/`design_source`/
-`knowledge_level`/`pressure_level`/`delivery_mode` (and, if
-`sprint_weekly`, the current sprint and its status). Makes no changes.
+`has_data_model`/`knowledge_level`/`pressure_level`/`delivery_mode` (and,
+if `sprint_weekly`, the current sprint and its status). Makes no changes.
 
 ## Key invariants
 
-- Never silently pick an entry point, has_ui answer, or design source —
-  confirm via `AskUserQuestion` even when the evidence looks obvious.
+- Never silently pick an entry point, has_ui answer, has_data_model
+  answer, or design source — confirm via `AskUserQuestion` even when the
+  evidence looks obvious.
 - Never invoke a stage whose gate isn't satisfied without the user
   explicitly overriding.
 - `planning/README.md` and `planning/project.config.yaml`'s `planning.*`

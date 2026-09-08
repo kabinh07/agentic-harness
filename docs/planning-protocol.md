@@ -1,14 +1,14 @@
 # Planning protocol (shared by all planning-phase commands)
 
-`/agentic-harness:brd`, `:srs`, `:design`, `:features`, `:adr`, and `:epics`
-all follow this protocol instead of restating it. `/agentic-harness:plan`
-follows it for its own cross-stage bookkeeping. If a stage command's own
-file says something more specific, the stage file wins — this is the
-default, not an override.
+`/agentic-harness:brd`, `:srs`, `:design`, `:dfd`, `:erd`, `:features`,
+`:adr`, and `:epics` all follow this protocol instead of restating it.
+`/agentic-harness:plan` follows it for its own cross-stage bookkeeping. If
+a stage command's own file says something more specific, the stage file
+wins — this is the default, not an override.
 
 ## Why a shared protocol
 
-Six stage commands doing the same four things (calibrating, asking,
+Eight stage commands doing the same four things (calibrating, asking,
 gating, recording) should do them identically, or a teammate reading
 `planning/BRD.md` today and `planning/FEATURES.md` next week hits a
 different convention each time. This file is the one place those
@@ -16,8 +16,8 @@ conventions live.
 
 ## Document format
 
-Every generated artifact (BRD, SRS, and — adapted per artifact — FEATURES,
-DESIGN, ADRs, EPICS) is a standalone document a stakeholder can open cold,
+Every generated artifact (BRD, SRS, and — adapted per artifact — DESIGN,
+DFD, ERD, FEATURES, ADRs, EPICS) is a standalone document a stakeholder can open cold,
 not a prose memo. Structure:
 
 - **Header table** — Document title, Version, Date, Author, Based on (the
@@ -138,6 +138,46 @@ epic," which is how NFRs quietly never get built. EARS lines are the
 contract a test is later written against; a criterion that can't be
 phrased as WHEN/IF...SHALL is usually still vague, not yet a real
 acceptance criterion.
+
+## Diagram conventions
+
+`/agentic-harness:dfd` and `/agentic-harness:erd` both draw diagrams;
+this is the one place their shared conventions live so neither file has
+to restate them.
+
+- **Diagrams are always mermaid text, never an image.** A stakeholder
+  reads the artifact cold in a plain markdown viewer or on GitHub — an
+  embedded picture can't be diffed, versioned, or read by a later stage
+  command the way a fenced ` ```mermaid ` block can.
+- **DFD node shapes and IDs** (Yourdon–DeMarco-style):
+  | Element | Shape | ID prefix | Mermaid |
+  |---|---|---|---|
+  | Process | stadium (rounded) | `P0`, `P1`… ; children `P1.1`… | `P1(["P1 Verb the noun"])` |
+  | Data store | cylinder | `D1`… | `D1[("D1 Orders")]` |
+  | External entity | rectangle | `EXT-01`… | `EXT01["EXT-01 Payment provider"]` |
+  | Data flow | labelled directed edge | `DF-01`… | `P1 -->|"DF-01 order payload"| D1` |
+  | Async/queued flow | dashed edge | `DF-07`… | `P1 -.->|"DF-07 receipt event"| P3` |
+  | Trust boundary | dashed subgraph | `TB-1`… | `subgraph TB1["TB-1 Public internet"]` |
+
+  Process names are **verb phrases** ("Validate submission"), never nouns
+  ("Validation service") — a noun names a component, and naming
+  components in a DFD is how it drifts into an accidental deployment
+  diagram. `P0` is reserved for the whole-system context-level node.
+- **Mermaid node IDs never contain a dot.** A level-2 process numbered
+  `P2.1` gets the mermaid ID `P2_1` (underscore) with the dotted number
+  carried in the label only: `P2_1(["P2.1 Validate payment"])`.
+- **ERD notation:** always mermaid `erDiagram`, crow's-foot cardinality
+  (`||--||` one-to-one, `||--o{` one-to-zero-or-many, `||--|{`
+  one-to-one-or-many, `}o--o|` zero-or-many-to-zero-or-one). Identifying
+  relationships (child cannot exist without parent) use `--`;
+  non-identifying use `..`.
+- **ID namespace — must not collide with an existing ID kind.** Taken
+  already: `FR-<MODULE>-##`, `NFR-<CATEGORY>-##`, `F-##` (feature), `E-##`
+  (epic), `T-##` (task), `EARS-<AREA>-#`, `ADR-NNNN`. DFD/ERD introduce
+  `P#`/`P#.#` (process), `D#` (data store), `EXT-##` (external entity —
+  deliberately not `E-##`, which is an epic), `DF-##` (data flow —
+  deliberately not `F-##`, which is a feature), `TB-#` (trust boundary).
+  Never reuse a prefix across artifact kinds.
 
 ## Versioning
 
@@ -278,10 +318,23 @@ Every stage ends the same way:
    `approved_on: <today>` in `planning/project.config.yaml`.
 4. **Revise** → archive-then-write with a version bump per Versioning,
    re-present, loop.
-5. **Skip** → only valid where the stage itself allows it (currently only
-   `design`, gated on `planning.has_ui`) — set `status: skipped`, write
-   nothing, and don't re-ask on future `/agentic-harness:plan` runs unless
-   the user explicitly revisits it (`/agentic-harness:plan design`).
+5. **Skip** → only valid where the stage's own command file defines a
+   `## Skip check` section naming a tri-state flag under `planning.`
+   (`true` | `false` | `"later"`, `null` = unasked). On `false`: set
+   `status: skipped`, write nothing, and don't re-ask on future
+   `/agentic-harness:plan` runs unless the user explicitly revisits it
+   (`/agentic-harness:plan <stage>`). On `"later"`/`null`: stay `pending`
+   and re-ask next run. **A skip flag contradicted by an approved
+   upstream artifact is reported, not honored** — see each skippable
+   stage's own Skip check for what "contradicted" means for it.
+
+   | Stage | Skippable when | Flag |
+   |---|---|---|
+   | `design` | the project has no UI | `planning.has_ui` |
+   | `erd` | the project has no structured data model | `planning.has_data_model` |
+
+   No other stage is skippable — `brd`, `srs`, `dfd`, `features`, `adr`,
+   `epics` are unconditional.
 
 A later stage that requires an earlier one to be `approved` (see each
 stage's own gate) refuses to run against a `draft` predecessor — tell the
@@ -303,9 +356,11 @@ it must always reflect reality without them having to open every artifact.
 ## Traceability
 
 Every artifact after the BRD should be able to point back up the chain:
-SRS requirement → BRD requirement (same ID, elaborated); Feature → SRS
-requirement(s); ADR → Feature/SRS requirement(s) it enables; Epic/Task →
-Feature → SRS requirement → BRD requirement. A stage command that
-finds an item with no upstream trace reports it as an orphan rather than
-silently keeping or dropping it — see each stage's own orphan-check step
-and the SRS's Appendix A traceability matrix.
+SRS requirement → BRD requirement (same ID, elaborated); DFD process →
+SRS requirement(s) it implements; DFD data store ↔ ERD entity (both
+directions); ERD entity → SRS requirement(s)/§4.1 entity; Feature → SRS
+requirement(s) and DFD process(es); ADR → Feature/SRS/DFD/ERD evidence it
+draws on; Epic/Task → Feature → SRS requirement → BRD requirement. A
+stage command that finds an item with no upstream trace reports it as an
+orphan rather than silently keeping or dropping it — see each stage's own
+orphan-check step and the SRS's Appendix A traceability matrix.

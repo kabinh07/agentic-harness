@@ -5,7 +5,8 @@ description: Two modes -- 'brief' emits planning/DESIGN_BRIEF.md from the SRS fo
 
 # /agentic-harness:design
 
-Third planning stage, and the only optional one. This plugin does not
+Third planning stage, and the first of two optional stages (the second is
+`/agentic-harness:erd`). This plugin does not
 produce design — you design externally (Claude design, Stitch, Figma,
 whatever). What this command does: turn the approved SRS into a design
 brief you can hand to that tool, and, once you've designed, distill the
@@ -107,5 +108,5 @@ Mode: brief/default
 Written: <planning/DESIGN_BRIEF.md or planning/DESIGN.md, or "skipped">
 Open questions: N
 Status: pending/draft/approved/skipped
-Next: /agentic-harness:features
+Next: /agentic-harness:dfd
 ```

@@ -5,7 +5,7 @@ description: Build planning/EPICS.md (plain-language Epics, scored WSJF, with EA
 
 # /agentic-harness:epics
 
-Sixth and final planning stage. Turns the approved feature/ADR set into an
+Eighth and final planning stage. Turns the approved feature/ADR set into an
 implementation-ready backlog: plain-language Epics decomposed straight into
 implementation-sized Tasks (no intermediate story layer), scored and
 sequenced, then seeds `TASKS.md` so `/agentic-harness:architect` has real

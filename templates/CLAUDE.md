@@ -7,7 +7,8 @@ any new project unchanged. It's installed via the `agentic-harness` Claude
 Code plugin, which provides:
 
 - Planning-phase commands: `/agentic-harness:plan` (driver), `/agentic-harness:brd`,
-  `/agentic-harness:srs`, `/agentic-harness:design`, `/agentic-harness:features`,
+  `/agentic-harness:srs`, `/agentic-harness:design`, `/agentic-harness:dfd`,
+  `/agentic-harness:erd`, `/agentic-harness:features`,
   `/agentic-harness:adr`, `/agentic-harness:epics`
 - Bootstrap commands: `/agentic-harness:init`, `/agentic-harness:configure`
 - Execution commands: `/agentic-harness:architect`, `/agentic-harness:manager`,
@@ -48,6 +49,11 @@ None of that lives in this repo.
    - `/agentic-harness:design` (skippable — only if the project has a UI) →
      `planning/DESIGN_BRIEF.md` (for your external design tool) then
      `planning/DESIGN.md` (consistency context, once you've designed)
+   - `/agentic-harness:dfd` → `planning/DFD.md` (data flow architecture —
+     processes, data stores, flows, trust boundaries; mandatory)
+   - `/agentic-harness:erd` (skippable — only if the project has no
+     structured data model) → `planning/ERD.md` (logical data model:
+     entities, keys, cardinality, access patterns)
    - `/agentic-harness:features` → `planning/FEATURES.md`
    - `/agentic-harness:adr` → `planning/adr/ADR-NNNN-*.md`
    - `/agentic-harness:epics` → `planning/EPICS.md` (plain-language epics,
@@ -125,7 +131,8 @@ Three kinds:
   (or directly via `/agentic-harness:test`) to write that change's tests —
   deliberately never the same agent that wrote the implementation.
 - **`agentic-harness:codebase-analyst`** — standing, read-only. Surveys an
-  existing codebase for the planning-phase commands (`:brd`, `:adr`) when
+  existing codebase for the planning-phase commands (`:brd`, `:dfd`,
+  `:erd`, `:adr`) when
   starting from real code instead of a blank idea: feature inventory,
   implicit architectural decisions, data model — all with evidence paths,
   every inference labeled as inference, never asserted as fact.

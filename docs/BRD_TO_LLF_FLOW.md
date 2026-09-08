@@ -4,15 +4,15 @@
 > phase — it runs before `/agentic-harness:architect` starts implementation,
 > and its own detailed questioning/gating rules live in
 > `planning-protocol.md`. This file is the map; the command files
-> (`plan.md`, `brd.md`, `srs.md`, `design.md`, `features.md`, `adr.md`,
-> `epics.md`) are the implementation.
+> (`plan.md`, `brd.md`, `srs.md`, `design.md`, `dfd.md`, `erd.md`,
+> `features.md`, `adr.md`, `epics.md`) are the implementation.
 
 ## Why this exists
 
 Business requirements are not implementation-sized tasks. Standard PM
 practice bridges that gap with a decomposition layer — Epics → Features →
 Tasks → Acceptance Criteria — before anyone writes code. This plugin's
-planning phase implements that layer as six question-driven commands,
+planning phase implements that layer as eight question-driven commands,
 orchestrated by `/agentic-harness:plan`, so `TASKS.md` always starts from a
 real, traceable backlog instead of an empty file or a BRD-to-task leap with
 nothing in between. Epics decompose straight into implementation-sized
@@ -32,8 +32,12 @@ flowchart TD
     D --> E{"has UI?"}
     E -- yes --> F1["/agentic-harness:design brief -> DESIGN_BRIEF.md (external tool)"]
     F1 --> F2["/agentic-harness:design -> planning/DESIGN.md"]
-    E -- no --> G
-    F2 --> G["/agentic-harness:features -> planning/FEATURES.md"]
+    E -- no --> G0
+    F2 --> G0["/agentic-harness:dfd -> planning/DFD.md"]
+    G0 --> H0{"structured data model?"}
+    H0 -- yes --> H1["/agentic-harness:erd -> planning/ERD.md"]
+    H0 -- no --> G
+    H1 --> G["/agentic-harness:features -> planning/FEATURES.md"]
     G --> H["/agentic-harness:adr -> planning/adr/*.md"]
     H --> I["/agentic-harness:epics -> planning/EPICS.md + seeds TASKS.md"]
     I --> J["/agentic-harness:architect (segment/swarm, dispatch, gate, review)"]
@@ -49,8 +53,10 @@ flowchart TD
 | Goals extraction | `/agentic-harness:configure` | `planning/BUSINESS_GOALS.md`, `planning/project.config.yaml` | BRD |
 | SRS | `/agentic-harness:srs` | `planning/SRS.md` (same `FR-<MODULE>-##` IDs, elaborated; `NFR-<CATEGORY>-##`) | BRD |
 | Design (optional) | `/agentic-harness:design` | `planning/DESIGN_BRIEF.md` then `planning/DESIGN.md` | SRS |
-| Features | `/agentic-harness:features` | `planning/FEATURES.md` (F-##) | SRS FR/NFR |
-| ADRs | `/agentic-harness:adr` | `planning/adr/ADR-NNNN-*.md` | Features/SRS |
+| DFD | `/agentic-harness:dfd` | `planning/DFD.md` (P#/D#/EXT-##/DF-##) | SRS FR |
+| ERD (optional) | `/agentic-harness:erd` | `planning/ERD.md` | SRS §4, DFD data stores |
+| Features | `/agentic-harness:features` | `planning/FEATURES.md` (F-##) | SRS FR/NFR, DFD processes |
+| ADRs | `/agentic-harness:adr` | `planning/adr/ADR-NNNN-*.md` | Features/SRS, DFD/ERD evidence |
 | Epics | `/agentic-harness:epics` | `planning/EPICS.md` (E-##/T-##) + delivery mode, seeds `TASKS.md` | Features → Goals |
 
 Every artifact after the BRD carries a trace back up this chain by ID —
@@ -88,5 +94,5 @@ and records it as `planning.entry_point`:
 ## Status
 
 Implemented — this is no longer a planning-only doc. See `plan.md` and the
-six stage command files for the authoritative behavior; this file stays as
+eight stage command files for the authoritative behavior; this file stays as
 the map when onboarding a new project or a new teammate to the flow.

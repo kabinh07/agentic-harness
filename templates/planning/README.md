@@ -4,8 +4,8 @@ Everything in this folder is one shareable bundle — drop the whole
 `planning/` directory in front of a teammate and they can see exactly where
 the project stands, what's decided, what's still open, and what was
 assumed once confirmed. Maintained by `/agentic-harness:plan` and the stage
-commands it drives (`:brd`, `:srs`, `:design`, `:features`, `:adr`,
-`:epics`); status here always matches `project.config.yaml`'s
+commands it drives (`:brd`, `:srs`, `:design`, `:dfd`, `:erd`, `:features`,
+`:adr`, `:epics`); status here always matches `project.config.yaml`'s
 `planning.stages`. Prior versions of every artifact live in `versions/` —
 nothing is ever silently overwritten (see `planning-protocol.md`'s
 Versioning section).
@@ -32,13 +32,15 @@ Delivery plan section)*
 | BRD | [BRD.md](BRD.md) | — | pending | — |
 | SRS | [SRS.md](SRS.md) | — | pending | — |
 | Design | [DESIGN.md](DESIGN.md) | — | pending | — |
+| DFD | [DFD.md](DFD.md) | — | pending | — |
+| ERD | [ERD.md](ERD.md) | — | pending | — |
 | Features | [FEATURES.md](FEATURES.md) | — | pending | — |
 | ADRs | [adr/](adr/README.md) | — | pending | — |
 | Epics | [EPICS.md](EPICS.md) | — | pending | — |
 
 Status values: `pending` (not started) · `draft` (written, not yet
 reviewed) · `in-review` · `approved` · `skipped` (e.g. Design, for a
-project with no UI).
+project with no UI; or ERD, for a project with no structured data model).
 
 ## Open Items (TBD)
 

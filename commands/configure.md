@@ -70,17 +70,27 @@ what `/agentic-harness:manager` uses as its rubric.
   user defers them, but note that in the report).
 
 ### Step 5 — First-pass segmentation (`architecture.segments`)
-If `planning/FEATURES.md` already exists (the planning phase reached the
-features stage before this ran), seed one `architecture.segments` entry per
-feature's "proposed owning area" — group features that named the same area
-into one segment. Otherwise, seed one entry per **BRD §6 module**
-(e.g. `FR-RUNTIME-*`, `FR-TOOL-*`, `FR-AUTH-*` — whatever modules this
-BRD actually defined → one segment candidate per module prefix)
-— this is usually a better starting signal than free-form component
-naming, since the module boundaries were already chosen deliberately for
-the requirement IDs. Either way: `name`, `description`, `trigger` (what
-kind of task routes here). Leave `owns_paths`, `agent`, and `test_command`
-blank — there's no code yet to own paths or a test command to run.
+Seed `architecture.segments` from whichever of these exists, in order of
+preference (each is a stronger signal than the next):
+
+1. **`planning/FEATURES.md`**, if it exists (the planning phase reached
+   the features stage before this ran) — one entry per feature's
+   "proposed owning area" (a DFD process ID by this point in the
+   pipeline), grouping features that named the same area into one segment.
+2. **`planning/DFD.md`**, if it exists but FEATURES doesn't yet — one
+   entry per §3.1 level-1 process; a process *is* a responsibility with
+   an I/O contract and owned data stores, which is exactly the shape
+   `architect.md` Phase 1.5 asks segments to have.
+3. **BRD §6 modules**, otherwise (e.g. `FR-RUNTIME-*`, `FR-TOOL-*`,
+   `FR-AUTH-*` — whatever modules this BRD actually defined → one segment
+   candidate per module prefix) — a reasonable starting signal since the
+   module boundaries were already chosen deliberately for the requirement
+   IDs, but the weakest of the three since it precedes any process/feature
+   decomposition.
+
+Either way: `name`, `description`, `trigger` (what kind of task routes
+here). Leave `owns_paths`, `agent`, and `test_command` blank — there's no
+code yet to own paths or a test command to run.
 `/agentic-harness:architect` fills those in and creates the actual
 `.claude/agents/<segment>.md` subagent the first time it runs against real
 code (see `architect.md` Phase 1.5). If the BRD has only one module or is

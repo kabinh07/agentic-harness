@@ -2,8 +2,8 @@
 # priorities, planning-phase status, and codebase segmentation. Lives inside
 # planning/ alongside every other planning artifact so the whole bundle is one
 # shareable folder. Filled in by the planning-phase commands
-# (/agentic-harness:plan, :brd, :srs, :design, :features, :adr, :epics) and
-# /agentic-harness:configure, then kept current by /agentic-harness:architect
+# (/agentic-harness:plan, :brd, :srs, :design, :dfd, :erd, :features, :adr,
+# :epics) and /agentic-harness:configure, then kept current by /agentic-harness:architect
 # as the codebase grows. Everything here is read by CLAUDE.md,
 # /agentic-harness:architect, /agentic-harness:manager, and any tool-mirror
 # skill (e.g. clickup-log) before they do anything else.
@@ -20,6 +20,7 @@ project:
 # SRS) — never guessed silently. has_ui/design_source gate the design stage;
 # has_ui: null means unasked, false means the design stage is skipped
 # entirely (design.md never written), "later" means ask again next run.
+# has_data_model gates the erd stage the same way — see below.
 planning:
   dir: planning
   versions_dir: planning/versions   # append-only archive; every artifact
@@ -28,6 +29,10 @@ planning:
   entry_point: ""       # idea | existing-project | brd | srs
   has_ui: null           # true | false | "later"
   design_source: ""      # claude-design | stitch | figma | none
+  has_data_model: null   # true | false | "later" — gates the erd stage; false
+    # means planning/ERD.md is never written, "later" means ask again next
+    # run. Contradicted by an approved DFD that declares any data store —
+    # erd.md's skip check refuses that combination rather than skipping.
   # Calibration (planning-protocol.md), asked once per session, reused by
   # every stage. knowledge_level: new | working | expert (default working).
   # pressure_level: light | standard | hard (default standard). User can
@@ -53,6 +58,8 @@ planning:
     brd:      { status: pending, artifact: planning/BRD.md,      version: "", approved_on: "" }
     srs:      { status: pending, artifact: planning/SRS.md,      version: "", approved_on: "" }
     design:   { status: pending, artifact: planning/DESIGN.md,   version: "", approved_on: "" }
+    dfd:      { status: pending, artifact: planning/DFD.md,      version: "", approved_on: "" }
+    erd:      { status: pending, artifact: planning/ERD.md,      version: "", approved_on: "" }
     features: { status: pending, artifact: planning/FEATURES.md, version: "", approved_on: "" }
     adr:      { status: pending, artifact: planning/adr/,        version: "", approved_on: "" }
     epics:    { status: pending, artifact: planning/EPICS.md,    version: "", approved_on: "" }

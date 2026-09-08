@@ -1,10 +1,10 @@
 # agentic-harness
 
 A Claude Code plugin for a reusable, end-to-end agentic dev workflow: a
-question-driven **planning phase** (BRD → SRS → design context → features →
-ADRs → epics, ending in a delivery-mode call — whole project at once, or
-committed weekly sprints) that hands off to a **manager** agent owning the
-business
+question-driven **planning phase** (BRD → SRS → design context → data flow
+architecture → data model → features → ADRs → epics, ending in a
+delivery-mode call — whole project at once, or committed weekly sprints)
+that hands off to a **manager** agent owning the business
 goals and a senior-engineer **architect** agent that segments the codebase,
 creates and removes scoped subagents (and temporary swarms for cross-segment
 work), and staffs a standing test-writer — all gated on a durable `TASKS.md`,
@@ -28,11 +28,13 @@ From inside Claude Code, in any project:
 This gives you every command below, available in every project:
 
 **Planning phase**
-- `/agentic-harness:plan` — driver/wizard, walks BRD → SRS → design →
-  features → ADR → epics
+- `/agentic-harness:plan` — driver/wizard, walks BRD → SRS → design → DFD →
+  ERD → features → ADR → epics
 - `/agentic-harness:brd`
 - `/agentic-harness:srs`
 - `/agentic-harness:design`
+- `/agentic-harness:dfd`
+- `/agentic-harness:erd`
 - `/agentic-harness:features`
 - `/agentic-harness:adr`
 - `/agentic-harness:epics`
@@ -62,7 +64,8 @@ tell it), an existing codebase (it surveys it via
 or an existing `planning/BRD.md`/`planning/SRS.md` — then drives each stage
 command in order, asking clarifying questions and never inventing an
 answer: BRD → `/agentic-harness:configure` → SRS → design (skippable, only
-if the project has a UI) → features → ADRs → epics. Each stage ends with an
+if the project has a UI) → DFD → ERD (skippable, only if the project has a
+structured data model) → features → ADRs → epics. Each stage ends with an
 approval gate; unresolved items land under that artifact's "Assumptions
 (unvalidated)" instead of being guessed. `planning/README.md` tracks stage
 status for the whole bundle so you can hand it to a teammate as-is.
@@ -119,7 +122,7 @@ dispatches any task.
 
 | Plugin-shipped (this repo) | Project-specific (grown per install) |
 |---|---|
-| `commands/*.md` phase structure (plan/brd/srs/design/features/adr/epics/configure/architect/manager/test/clickup-log) | `planning/project.config.yaml` values |
+| `commands/*.md` phase structure (plan/brd/srs/design/dfd/erd/features/adr/epics/configure/architect/manager/test/clickup-log) | `planning/project.config.yaml` values |
 | `agents/test-writer.md`, `agents/codebase-analyst.md` | `planning/BUSINESS_GOALS.md`, `planning/SRS.md`, `planning/FEATURES.md`, `planning/adr/*.md` content |
 | `templates/CLAUDE.md` load order | `planning/ENGINEERING_STANDARDS.md`'s "Project-specific additions" |
 | `templates/TASKS.md` schema | `architecture.segments`/`architecture.swarms` and their `.claude/agents/*.md` subagents |

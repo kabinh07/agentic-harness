@@ -137,6 +137,10 @@ just a note here)
 ### 4.3 Entity Relationships (summary)
 ### 4.4 <State machine, if the domain has one> (table: From | To | Trigger/actor | Guard/rule)
 
+*This section stays a summary — the full logical data model (keys,
+cardinality, normalization, access patterns) belongs in
+`/agentic-harness:erd`'s `planning/ERD.md`, not here.*
+
 ## 5. External Interface Requirements
 ### 5.1 User Interfaces
 ### 5.2 Software Interfaces (API — functional)
@@ -186,5 +190,5 @@ Modules elaborated: N, Requirements: N (M/S/C: n/n/n), NFRs: N
 Traceability: N/N BRD requirements covered (or list gaps)
 Open items: N
 Status: draft/approved
-Next: /agentic-harness:design (if has_ui) or /agentic-harness:features
+Next: /agentic-harness:design (if has_ui) or /agentic-harness:dfd
 ```
