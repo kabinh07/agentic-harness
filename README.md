@@ -19,7 +19,7 @@ and leaves every planning artifact in one shareable `planning/` folder.
 From inside Claude Code, in any project:
 
 ```
-/plugin marketplace add /path/to/agentic-harness
+/plugin marketplace add https://github.com/kabinh07/agentic-harness.git
 /plugin install agentic-harness
 ```
 
