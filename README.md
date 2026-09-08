@@ -25,6 +25,19 @@ From inside Claude Code, in any project:
 
 (or, once published, `/plugin marketplace add kabinh07/agentic-harness`).
 
+## Updating the plugin
+
+From inside Claude Code, in any project where it's already installed:
+
+```
+/plugin marketplace update agentic-harness
+/reload-plugins
+```
+
+This picks up new/changed commands, agents, and skills without needing to
+uninstall/reinstall or restart the session — the reload command's output
+line tells you how many plugins/skills/agents/hooks it picked up.
+
 This gives you every command below, available in every project:
 
 **Planning phase**
