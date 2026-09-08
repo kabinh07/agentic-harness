@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
   "name": "agentic-harness",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Idea/BRD/SRS-to-code agentic workflow: a calibrated, grill-me-style question ladder drives a planning phase (versioned BRD, SRS, design context, data flow architecture, data model, features, ADRs, epics — module-prefixed requirement IDs, consulting-grade document format) that hands off to a manager agent owning business goals and a senior-engineer architect that segments the codebase, creates and removes scoped subagents (and temporary swarms) per segment, and staffs a standing test-writer. Durable test-gated TASKS.md, optional mirroring to external trackers (ClickUp, etc).",
   "author": {
     "name": "Kabin",
