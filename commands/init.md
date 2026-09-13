@@ -41,4 +41,8 @@ command creates them.
 4. Report (≤6 lines): files created, files skipped (already existed), and
    the next step — run `/agentic-harness:plan` (it will ask whether you're
    starting from an idea, an existing codebase, an existing BRD, or an
-   existing SRS, and drive the rest of the planning phase from there).
+   existing SRS, and drive the rest of the planning phase from there). If
+   any file was skipped because it already existed, add a line pointing at
+   `/agentic-harness:doctor` — it checks whether that pre-existing file is
+   missing anything the current templates have (relevant when re-running
+   `init` in a project bootstrapped by an older version of this plugin).

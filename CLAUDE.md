@@ -41,6 +41,7 @@ commands/              # -> /agentic-harness:<name> slash commands
   epics.md                      # -> planning/EPICS.md, seeds TASKS.md
   init.md               # scaffold templates/ into a new project
   configure.md           # BRD -> config + BUSINESS_GOALS.md + TASKS.md
+  doctor.md               # detect/fix scaffolded files stale vs current templates
   architect.md             # orchestrator: segment/swarm lifecycle, delegate, test, gate, review
   manager.md                # goal-owning, periodic health-check / task-queuing
   test.md                    # thin command wrapper around agentic-harness:test-writer

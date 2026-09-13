@@ -118,6 +118,10 @@ Next: run /agentic-harness:architect to start implementation
 Approved), plus current `entry_point`/`has_ui`/`design_source`/
 `has_data_model`/`knowledge_level`/`pressure_level`/`delivery_mode` (and,
 if `sprint_weekly`, the current sprint and its status). Makes no changes.
+Also mention `/agentic-harness:doctor` as the way to check whether
+`CLAUDE.md`/`TASKS.md`/`planning/*` are missing anything the currently
+installed plugin's templates have — relevant for a project that was
+bootstrapped a while ago and may predate a template update.
 
 ## Key invariants
 

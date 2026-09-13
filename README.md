@@ -55,6 +55,7 @@ This gives you every command below, available in every project:
 **Bootstrap & execution**
 - `/agentic-harness:init`
 - `/agentic-harness:configure`
+- `/agentic-harness:doctor`
 - `/agentic-harness:architect`
 - `/agentic-harness:manager`
 - `/agentic-harness:test`

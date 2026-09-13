@@ -10,7 +10,10 @@ Code plugin, which provides:
   `/agentic-harness:srs`, `/agentic-harness:design`, `/agentic-harness:dfd`,
   `/agentic-harness:erd`, `/agentic-harness:features`,
   `/agentic-harness:adr`, `/agentic-harness:epics`
-- Bootstrap commands: `/agentic-harness:init`, `/agentic-harness:configure`
+- Bootstrap commands: `/agentic-harness:init`, `/agentic-harness:configure`,
+  `/agentic-harness:doctor` (run after a plugin update to check whether
+  your scaffolded files — `CLAUDE.md`, `TASKS.md`, `planning/*` — are
+  missing anything the current templates have)
 - Execution commands: `/agentic-harness:architect`, `/agentic-harness:manager`,
   `/agentic-harness:test`, `/agentic-harness:clickup-log`
 - The standing `agentic-harness:test-writer` and `agentic-harness:codebase-analyst` agents
