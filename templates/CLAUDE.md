@@ -97,14 +97,18 @@ None of that lives in this repo.
   (via the Agent tool, so each subagent's context stays scoped to its own
   area instead of the whole codebase) — it writes code directly only when
   delegation genuinely isn't worth it (a one-line fix, a cross-cutting
-  change no segment owns). Either way, before marking a task ✅ DONE it
-  gates on three things: the standing `agentic-harness:test-writer` agent
-  having written independent tests for the change, those tests passing, and
-  an architecture/standards review against `planning/ENGINEERING_STANDARDS.md`.
+  change no segment owns). Follows TDD (red-green-refactor): before marking
+  a task ✅ DONE it gates on three things — the standing
+  `agentic-harness:test-writer` agent having written failing tests from the
+  task's spec *before* any implementation exists (RED) and confirmed they
+  fail for the right reason, the implementer's code then passing those
+  same tests (GREEN, never rewritten to fit whatever got implemented), and
+  an architecture/standards review against
+  `planning/ENGINEERING_STANDARDS.md`.
 - **`/agentic-harness:test`** — thin command wrapper around the standing
-  test-writer agent, for running the test-gate directly instead of only as
-  part of an architect dispatch. Never edits production code, never marks
-  a task done.
+  test-writer agent's RED/GREEN/characterization modes, for running either
+  half of the TDD cycle directly instead of only as part of an architect
+  dispatch. Never edits production code, never marks a task done.
 - **Tool-mirror skills** (e.g. `/agentic-harness:clickup-log`) — mirror
   every `TASKS.md` write to whichever external tracker is enabled under
   `tools:` in config. Only mirror rows dated on/after that tool's
@@ -127,9 +131,12 @@ Three kinds:
   structure.
 - **`agentic-harness:test-writer`** — standing exception, shipped by the
   plugin itself, not authored per project and not a file in this repo.
-  Cross-cutting, owns no paths, dispatched after every implementation task
-  (or directly via `/agentic-harness:test`) to write that change's tests —
-  deliberately never the same agent that wrote the implementation.
+  Cross-cutting, owns no paths. Enforces TDD: dispatched **before** every
+  implementation task (RED — writes failing tests from the task's spec,
+  confirms they fail for the right reason) and again **after** (GREEN —
+  re-runs the same tests, confirms they now pass) — or directly via
+  `/agentic-harness:test red`/`green`. Deliberately never the same agent
+  that wrote the implementation.
 - **`agentic-harness:codebase-analyst`** — standing, read-only. Surveys an
   existing codebase for the planning-phase commands (`:brd`, `:dfd`,
   `:erd`, `:adr`) when

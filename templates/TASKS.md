@@ -3,8 +3,10 @@
 > Single source of truth for all agentic work in this repo. `/agentic-harness:architect` reads
 > this before planning; `/agentic-harness:manager` and `/agentic-harness:epics` append new
 > tasks here — every task must cite the business goal (from `planning/BUSINESS_GOALS.md`) it
-> serves, and, if it came from the planning phase, its `[E-##/F-##]` trace tag; a task serving
-> no goal doesn't get queued without an explicit reason. Any enabled tool-mirror skill (see
+> serves, and, if it came from the planning phase, its `[E-##/F-## · EARS-<AREA>-#]` trace tag
+> (the `EARS-<AREA>-#` part is what `/agentic-harness:architect`'s RED phase resolves back to
+> the literal acceptance-criterion text before writing tests — see `epics.md`'s Seed TASKS.md
+> section); a task serving no goal doesn't get queued without an explicit reason. Any enabled tool-mirror skill (see
 > `planning/project.config.yaml`'s `tools:` block, e.g. `/agentic-harness:clickup-log`) mirrors
 > every write to the external tracker, scoped to rows dated `tools.<name>.mirror_from_date`
 > onward — no backfill.

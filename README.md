@@ -105,26 +105,34 @@ dispatches any task.
    (`architecture.segments` in config) — creating subagents for new areas
    **and removing** `.claude/agents/<segment>.md` files for areas that no
    longer exist or have merged.
-3. Architect dispatches the task to that segment's subagent via the Agent
-   tool — the subagent gets the task, its own `owns_paths` boundary, and
-   the goal it serves; nothing else. This is what keeps context small on
-   both sides: architect never holds implementation detail, the subagent
-   never holds the rest of the codebase. Delegation is the default;
-   architect implements directly only when it's not worth a dispatch (a
-   one-line fix, a change no single segment owns). For work that
-   genuinely spans segments, architect can form a temporary **swarm** —
-   several segment agents dispatched in parallel on one task, each still
-   bounded to its own paths — torn down once the task closes.
-4. The subagent (or architect-direct, or swarm) implements the change,
-   scoped to its own area(s).
-5. Architect dispatches the standing `agentic-harness:test-writer` agent
-   (also invocable directly via `/agentic-harness:test`) to write tests for
-   exactly that change — deliberately never the same agent that wrote the
-   implementation. No implementation task is done without tests from this
-   independent pass.
+3. **RED** — Architect dispatches the standing `agentic-harness:test-writer`
+   agent (also invocable directly via `/agentic-harness:test red`) with
+   the task's spec, **before any implementation exists** — it writes
+   failing tests describing the required behavior and confirms they fail
+   for the right reason (missing implementation, not a broken test).
+   Deliberately never the same agent that will write the implementation.
+4. **GREEN** — Architect dispatches the task to that segment's subagent
+   via the Agent tool, handing it the RED-phase tests it must satisfy —
+   the subagent gets the task, those tests, its own `owns_paths` boundary,
+   and the goal it serves; nothing else. This is what keeps context small
+   on both sides: architect never holds implementation detail, the
+   subagent never holds the rest of the codebase. Delegation is the
+   default; architect implements directly only when it's not worth a
+   dispatch (a one-line fix, a change no single segment owns). For work
+   that genuinely spans segments, architect can form a temporary
+   **swarm** — several segment agents dispatched in parallel on one task,
+   each still bounded to its own paths — torn down once the task closes.
+   The subagent (or architect-direct, or swarm) writes the *minimum* code
+   to pass those tests — no extra features riding along.
+5. Architect re-dispatches `agentic-harness:test-writer` (or
+   `/agentic-harness:test green`) to re-run the **same** RED-phase tests
+   — never rewritten to fit the implementation — and confirms they now
+   pass. A **REFACTOR** pass follows only if the fast-to-green code
+   actually needs cleanup, with the tests required to stay green
+   throughout.
 6. Architect gates completion on three things before touching the status
-   column: the test-writer's tests existing, the segment's tests passing
-   (including the new ones), and an architecture/standards review against
+   column: the RED confirmation existing, the GREEN pass (including any
+   post-refactor re-run), and an architecture/standards review against
    `planning/ENGINEERING_STANDARDS.md` (stayed in bounds, no dead code, no
    premature abstraction, matches existing patterns). Any gate failing
    sends it back or marks it ⚠ BLOCKED — never ✅ DONE on "looks right."

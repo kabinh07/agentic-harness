@@ -1,6 +1,6 @@
 ---
 name: epics
-description: Build planning/EPICS.md (plain-language Epics, scored WSJF, with EARS acceptance criteria, directly decomposed into implementation-sized Tasks) from FEATURES.md, BUSINESS_GOALS.md, and ADRs; decide delivery mode (whole project at once vs weekly sprints); then seed TASKS.md with the initial backlog, mirroring to any enabled external tool. Last planning stage -- hands off to /agentic-harness:architect.
+description: Build planning/EPICS.md (plain-language Epics, scored WSJF, with EARS acceptance criteria, directly decomposed into implementation-sized Tasks -- each citing the specific EARS line(s) it satisfies) from FEATURES.md, BUSINESS_GOALS.md, and ADRs; decide delivery mode (whole project at once vs weekly sprints); then seed TASKS.md with the initial backlog, mirroring to any enabled external tool. Last planning stage -- hands off to /agentic-harness:architect.
 ---
 
 # /agentic-harness:epics
@@ -56,11 +56,22 @@ work queued from its first run. Follows
    XS/S/M/L (split anything that wants to be XL), scored M/S/C (MoSCoW),
    with `depends_on` (other task ids, cross-epic is fine) and a trace tag
    (`F-##`/`FR-<MODULE>-##`). A task that can't trace this way gets fixed
-   (find the real trace) or dropped, not queued anyway. If a task turns out
-   to need its own acceptance line beyond the epic's EARS criteria (a
-   sharp edge case specific to that task), add one `EARS-<AREA>-#` line
-   inline under it — most tasks won't need this; the epic's criteria
-   already cover them.
+   (find the real trace) or dropped, not queued anyway.
+
+   **Each task also cites which of the epic's `EARS-<AREA>-#` line(s) it's
+   responsible for satisfying** — not just the epic/feature it belongs to.
+   This is what lets `/agentic-harness:architect`'s RED phase hand
+   `test-writer` the literal acceptance-criterion text instead of a
+   paraphrase, so the RED-phase test is a direct translation of the
+   approved spec, not the model's own re-interpretation of it. Most tasks
+   claim one or two lines; a task claiming none needs a reason (pure
+   scaffolding/plumbing with no directly testable behavior of its own —
+   rare, and worth double-checking it isn't actually missing a criterion).
+   If a task needs its own acceptance line beyond what the epic already
+   states (a sharp edge case specific to that task), add one new
+   `EARS-<AREA>-#` line under the epic's Acceptance criteria section and
+   cite it here — never invent an unlisted criterion inline in the task
+   row itself.
 
 6. **Delivery mode** — ask the user once, via `AskUserQuestion`:
    **whole project at once**, or **weekly sprints** (Monday–Sunday, one
@@ -138,9 +149,9 @@ provisional and get re-confirmed at their boundary.
 - **EARS-<AREA>-2**: IF `<error>`, THEN the system SHALL `<response>` (FR-...)
 
 ### Tasks
-| Task | Description | Size | MoSCoW | Depends on | Traces to |
-|---|---|---|---|---|---|
-| T-01 | <implementation-sized task> | S | Must | — | F-##/FR-<MODULE>-## |
+| Task | Description | Size | MoSCoW | Depends on | Traces to | EARS |
+|---|---|---|---|---|---|---|
+| T-01 | <implementation-sized task> | S | Must | — | F-##/FR-<MODULE>-## | EARS-<AREA>-1 |
 
 ### Risks
 | Risk | Mitigation |
@@ -152,6 +163,11 @@ provisional and get re-confirmed at their boundary.
 ## Coverage check
 Every Feature/FR lands in exactly one epic; orphans and duplicates are both
 breakdown failures — list any, or "none".
+
+**EARS ↔ task, bidirectional:** every `EARS-<AREA>-#` line is claimed by
+at least one task; every task claims at least one `EARS-<AREA>-#` line
+unless explicitly justified as pure scaffolding with no testable behavior
+of its own. List any exceptions, or "none".
 
 ## Open Items (TBD)
 1. <unresolved item> (§<epic it affects>)
@@ -165,8 +181,15 @@ breakdown failures — list any, or "none".
 For every Task row above, append a row using the existing schema:
 
 ```
-| N | <task, specifics from EPICS.md> [E-##/F-##] | <goal> | Planning YYYY-MM-DD | 🔴/🟡/🟢 | <Sprint N or —> | ⏳ TODO | — | — | — |
+| N | <task, specifics from EPICS.md> [E-##/F-## · EARS-<AREA>-#[,EARS-<AREA>-#2]] | <goal> | Planning YYYY-MM-DD | 🔴/🟡/🟢 | <Sprint N or —> | ⏳ TODO | — | — | — |
 ```
+
+The `EARS-<AREA>-#` reference in the trace tag is what
+`/agentic-harness:architect`'s RED phase resolves back to the literal
+acceptance-criterion text in `EPICS.md` before dispatching `test-writer` —
+carry it through even though it makes the tag longer; it's the pointer
+that keeps RED-phase tests a direct translation of the approved spec
+instead of a fresh paraphrase of the task description.
 
 - Priority derived from the epic's WSJF rank and MoSCoW (Must → 🔴/🟡,
   Should/Could → 🟡/🟢) — use judgment, don't mechanically force every row
@@ -197,6 +220,7 @@ planning/EPICS.md: v<version> — N epics (wedge: E-##), N tasks
 Delivery mode: whole project at once | weekly sprints (Sprint 1: <epics>)
 TASKS.md: N rows seeded
 Traceability: all tasks trace to a goal (or list exceptions)
+EARS coverage: N/N EARS lines claimed by a task, N/N tasks claim an EARS line (or list exceptions)
 Status: draft/approved
 Planning phase complete: <yes/no — list any stage still pending/draft>
 Next: run /agentic-harness:architect to begin implementation

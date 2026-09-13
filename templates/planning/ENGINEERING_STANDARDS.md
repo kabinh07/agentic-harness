@@ -7,6 +7,15 @@
 
 ## Non-negotiable
 
+- **Tests are written first (TDD).** `agentic-harness:test-writer` writes
+  failing tests from the task's spec before any implementation exists
+  (RED), confirms the failure is for the right reason (missing
+  implementation, not a broken test), and only then does a segment agent
+  (or architect-direct) implement the minimum code to pass them (GREEN).
+  Tests are never rewritten after the fact to match whatever the
+  implementation happens to do. Use the AAA pattern (Arrange-Act-Assert)
+  and name tests after the behavior they lock in
+  (`should_return_empty_when_no_items`, not `test_1`).
 - **Tests pass.** A task without a passing test run is not done — no
   exception, no "looks correct to me."
 - **No cross-segment edits without sign-off.** A segment agent only

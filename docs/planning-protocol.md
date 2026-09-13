@@ -360,7 +360,11 @@ SRS requirement → BRD requirement (same ID, elaborated); DFD process →
 SRS requirement(s) it implements; DFD data store ↔ ERD entity (both
 directions); ERD entity → SRS requirement(s)/§4.1 entity; Feature → SRS
 requirement(s) and DFD process(es); ADR → Feature/SRS/DFD/ERD evidence it
-draws on; Epic/Task → Feature → SRS requirement → BRD requirement. A
-stage command that finds an item with no upstream trace reports it as an
+draws on; Epic → Feature → SRS requirement → BRD requirement; Task →
+`EARS-<AREA>-#` acceptance line(s) it satisfies → Epic (and, through it,
+the same Feature/SRS/BRD chain). The Task→EARS link is what
+`/agentic-harness:architect`'s RED phase resolves to hand `test-writer`
+literal acceptance-criterion text instead of a paraphrase. A stage
+command that finds an item with no upstream trace reports it as an
 orphan rather than silently keeping or dropping it — see each stage's own
 orphan-check step and the SRS's Appendix A traceability matrix.

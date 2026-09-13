@@ -103,12 +103,13 @@ segment's `owns_paths` no longer exist), and always on `resegment`.
 7. Alongside segment agents, architect maintains one standing, cross-cutting
    test-writer agent, shipped by the agentic-harness plugin itself as
    `agentic-harness:test-writer` (Agent tool `subagent_type`) — not
-   something architect authors per project, since "write tests for this
-   change" isn't codebase-specific the way a segment is. It reads whatever
-   a segment agent (or architect-direct) just changed and writes the tests
-   for it. Registered under `planning/project.config.yaml`'s
-   `architecture.test_agent`. It's also invocable directly via
-   `/agentic-harness:test`, outside an architect run.
+   something architect authors per project, since "write the tests for
+   this task" isn't codebase-specific the way a segment is. It writes
+   failing tests from a task's spec **before** a segment agent (or
+   architect-direct) implements anything (RED), then re-confirms them
+   passing afterward (GREEN) — see Phase 3 below. Registered under
+   `planning/project.config.yaml`'s `architecture.test_agent`. It's also
+   invocable directly via `/agentic-harness:test`, outside an architect run.
 
 Never let two segments' `owns_paths` overlap — if a change legitimately
 needs both, that's two tasks (one per segment), a swarm (see below), or a
@@ -141,10 +142,11 @@ named swarm instead of forcing one agent outside its bounds:
 7. **Goal check**: every task must cite which `planning/BUSINESS_GOALS.md`
    goal it serves (`Goal` column in TASKS.md) — if the task came from the
    planning phase, this may be the fuller trace chain
-   Task→Epic→Feature→FR→Goal (see `planning/EPICS.md`), condensed to
-   the `[E-##/F-##]` tag plus the goal string. A task with no goal
-   doesn't get queued silently — either find the goal it actually serves,
-   mark it explicitly as infra/tooling (allowed, but labeled), or drop it.
+   Task→EARS→Epic→Feature→FR→Goal (see `planning/EPICS.md`), condensed to
+   the `[E-##/F-## · EARS-<AREA>-#]` tag plus the goal string. A task with
+   no goal doesn't get queued silently — either find the goal it actually
+   serves, mark it explicitly as infra/tooling (allowed, but labeled), or
+   drop it.
 8. Write to TASKS.md first — all new tasks get ⏳ TODO, with Goal and
    Agent filled in. For each tool under `config.tools` with
    `enabled: true`, invoke that tool's mirror skill (e.g. `/agentic-harness:clickup-log`)
@@ -165,47 +167,83 @@ path — architect writes code directly (architect-direct) only when
 delegation genuinely isn't worth it: a one-line fix, a change too small to
 justify a dispatch round-trip, or a cross-cutting edit no single segment
 owns. Architect-direct is an allowed exception, not a forbidden mode — and
-it still goes through the same test-generation, gate, and review steps
-below as any dispatched task.
+it still goes through the same RED, GREEN, refactor, and review steps
+below as any dispatched task (RED still comes from `test-writer`, never
+from architect itself).
 
-Per task:
+Per task, following red-green-refactor — tests are written **before**
+implementation, by an agent that never also implements, no exceptions
+for architect-direct:
+
 ```
 a. TASKS.md → 🔄 IN_PROGRESS, record Started date. Sync via enabled tool-mirror skill(s).
-b. Implement: dispatch to the owning segment's agent (Agent tool,
-   subagent_type = the segment's `agent` name), or every member of a formed
-   swarm in parallel, with the task, the segment's owns_paths boundary, and
-   the goal it serves — nothing more; don't paste the whole TASKS.md or
-   other segments' context in. Or, if this is an architect-direct case,
-   implement it inline and say why delegation was skipped.
-c. Test generation — MANDATORY, every implementation task, no exceptions
-   for architect-direct either: dispatch the standing `agentic-harness:test-writer`
-   agent (or invoke it via `/agentic-harness:test`) with the change (diff or summary),
-   the segment's owns_paths, and the goal it serves. It writes or extends tests
-   covering the change against the project's existing test framework/patterns.
-   A task with no accompanying tests from this step is not done — the
-   test-writer being separate from the implementer is the point, so tests
-   aren't graded by whoever wrote the code.
-d. Test gate (hard requirement, not a suggestion): run the segment's
-   `test_command` (or the project's full suite if it has none of its
-   own), including the tests step c just added.
+b. RED — MANDATORY, every implementation task, dispatched before any code
+   is written: if the task's `TASKS.md` row carries an `EARS-<AREA>-#`
+   reference in its trace tag (`[E-##/F-## · EARS-<AREA>-#]` — see
+   `epics.md`'s Seed TASKS.md section), resolve it to the literal
+   WHEN/IF...SHALL text in `planning/EPICS.md` first — hand `test-writer`
+   that exact acceptance-criterion text, not a paraphrase of the task
+   description. If the task has no EARS reference (an ad hoc/manager-queued
+   task with no planning-phase trace), hand it the plain task description
+   instead — that's expected, not an error. Either way, dispatch the
+   standing `agentic-harness:test-writer` agent (Mode 1, or invoke it via
+   `/agentic-harness:test red <task>`) with that spec, the segment's
+   owns_paths, and the goal it serves — there is no diff to hand it, only
+   the spec. It writes tests describing the required behavior and runs
+   them itself to confirm they fail for the right reason (missing
+   implementation, not a broken test). A task with no RED confirmation
+   from this step does not proceed to implementation — that confirmation
+   is what makes the tests a real spec instead of an after-the-fact
+   rubber stamp.
+c. GREEN — Implement: dispatch to the owning segment's agent (Agent tool,
+   subagent_type = the segment's `agent` name), or every member of a
+   formed swarm in parallel, with the task, the RED-phase tests it must
+   satisfy, the segment's owns_paths boundary, and the goal it serves —
+   nothing more; don't paste the whole TASKS.md or other segments'
+   context in. Instruct it to write the **minimum** code that passes
+   those tests — no extra features, no speculative generalization riding
+   along. Or, if this is an architect-direct case, implement it inline
+   the same way and say why delegation was skipped.
+d. GREEN gate (hard requirement, not a suggestion): dispatch
+   `agentic-harness:test-writer` again (Mode 2, or `/agentic-harness:test
+   green`) to re-run the **same** RED-phase tests — never rewritten to
+   fit whatever the implementation produced — plus run the segment's
+   `test_command` (or the project's full suite if it has none of its own).
    - Fails → NOT done. An implementation bug sends it back to the segment
-     agent (or architect, if architect-direct); a bad/flaky test sends it
-     back to test-writer. Never mark ✅ DONE on "looks correct."
-e. Architecture review (architect does this itself — cheap, it's a diff
+     agent (or architect, if architect-direct) for another GREEN attempt;
+     a test that turns out to have been wrong goes back to test-writer to
+     fix, which then requires a fresh RED confirmation against it before
+     GREEN is re-attempted. Never mark ✅ DONE on "looks correct."
+e. REFACTOR (only if the GREEN-phase implementation needs it — duplication,
+   poor naming, structure that only happened to get to green fastest):
+   dispatch back to the same implementer with an explicit constraint —
+   behavior must not change, the RED-phase tests must stay green
+   throughout. Re-run the test gate after. If no refactor is warranted,
+   say so explicitly and skip; refactoring isn't mandatory busywork every
+   task, only when the fast-to-green code actually needs cleanup.
+f. Architecture review (architect does this itself — cheap, it's a diff
    read, not a rewrite): check the change stayed inside owns_paths, and
    spot-check against planning/ENGINEERING_STANDARDS.md (no dead code, no
    unrequested scope creep, matches existing segment patterns, comments
    justified). Fails review → send back to whoever owns the issue with
    the specific objection — don't fix it inline yourself and don't wave
    it through.
-f. TASKS.md → ✅ DONE only once c, d, and e all pass, record Completed.
-   If this closed out a swarm's task, remove that swarm's
-   `architecture.swarms` entry now.
+g. TASKS.md → ✅ DONE only once b (RED confirmed), d (GREEN passing,
+   including after any e), and f all pass, record Completed. If this
+   closed out a swarm's task, remove that swarm's `architecture.swarms`
+   entry now.
    New issues found along the way → new ⏳ TODO tasks (through Phase 2's
    goal-check), never silently fixed inline.
    Failure at any gate → ⚠ BLOCKED with a one-line reason. Sync via
    enabled tool-mirror skill(s), including a log comment.
 ```
+
+**Legacy/retrofit exception:** if a task is explicitly about adding tests
+to code that already exists with no tests (e.g. bringing an
+`existing-project` codebase under test for the first time), there is no
+RED phase to run — dispatch `agentic-harness:test-writer` in Mode 3
+(characterization) instead, and say so in the task so nobody mistakes it
+for a spec-driven RED confirmation.
 
 ## Phase 4 — Verify
 
@@ -228,10 +266,14 @@ confirmation.
   writes code directly only when delegation isn't worth it (a one-line
   fix, a cross-cutting change no single segment owns) — and when it does,
   the same test-generation, gate, and review steps still apply, no shortcut.
-- Every implementation task ships tests written by the standing
-  `test-writer` agent, never by the same agent that wrote the
-  implementation — no task is DONE without accompanying tests that pass.
-- A task is ✅ DONE only when its tests pass. No exceptions logged as done anyway.
+- Every implementation task's tests are written by the standing
+  `test-writer` agent **before** the implementation exists (RED), never
+  by the same agent that wrote the implementation, and never rewritten
+  after the fact to match whatever the implementation produced — no task
+  is DONE without a RED confirmation followed by a GREEN pass of those
+  same tests.
+- A task is ✅ DONE only when its RED-phase tests pass GREEN (and stay
+  green through any REFACTOR step). No exceptions logged as done anyway.
 - Every task traces to a `planning/BUSINESS_GOALS.md` goal (or is explicitly
   labeled infra/tooling) — no goal-less scope creep.
 - Segment `owns_paths` never overlap; a cross-segment need is two tasks or
