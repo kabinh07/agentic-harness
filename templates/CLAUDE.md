@@ -13,7 +13,11 @@ Code plugin, which provides:
 - Bootstrap commands: `/agentic-harness:init`, `/agentic-harness:configure`,
   `/agentic-harness:doctor` (run after a plugin update to check whether
   your scaffolded files — `CLAUDE.md`, `TASKS.md`, `planning/*` — are
-  missing anything the current templates have)
+  missing anything the current templates have), `/agentic-harness:adapt`
+  (alternative to `/agentic-harness:plan` — for a project whose planning
+  was already done by another agentic tool; reads that tool's own output
+  and feeds it into this same architect/manager/test-writer execution loop
+  instead of the native BRD→...→EPICS chain)
 - Execution commands: `/agentic-harness:architect`, `/agentic-harness:manager`,
   `/agentic-harness:test`, `/agentic-harness:clickup-log`
 - The standing `agentic-harness:test-writer` and `agentic-harness:codebase-analyst` agents

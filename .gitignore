@@ -31,3 +31,6 @@ __pycache__/
 *.egg-info/
 .pytest_cache/
 .mypy_cache/
+
+# Other Claude Code plugins' own local state (not part of this plugin)
+.forge/

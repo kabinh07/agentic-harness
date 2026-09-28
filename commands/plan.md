@@ -26,6 +26,11 @@ approval-gate, and bookkeeping rules every stage shares.
 If `planning/project.config.yaml` doesn't exist, stop and tell the user to
 run `/agentic-harness:init` first.
 
+If `planning.source == external`, stop and point at
+`/agentic-harness:adapt` instead — this driver walks the native
+`BRD → ... → EPICS` chain only, and a project whose planning was already
+adopted from another tool shouldn't be walked through it.
+
 ## Phase 1 — Determine entry point (first run only)
 
 If `planning.entry_point` is already set, skip this phase.

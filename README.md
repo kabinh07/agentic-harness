@@ -56,6 +56,10 @@ This gives you every command below, available in every project:
 - `/agentic-harness:init`
 - `/agentic-harness:configure`
 - `/agentic-harness:doctor`
+- `/agentic-harness:adapt` — alternative to `/agentic-harness:plan` for a
+  project whose planning was already done by another agentic tool (Forge
+  today); reads that tool's own output and feeds it into the same
+  architect/manager/test-writer execution loop
 - `/agentic-harness:architect`
 - `/agentic-harness:manager`
 - `/agentic-harness:test`

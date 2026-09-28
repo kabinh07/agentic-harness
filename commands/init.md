@@ -38,11 +38,25 @@ command creates them.
    `TASKS.md`), don't touch it — tell the user they'll need to merge the
    harness's load-order section in by hand instead of silently appending to
    instructions they already wrote.
-4. Report (≤6 lines): files created, files skipped (already existed), and
-   the next step — run `/agentic-harness:plan` (it will ask whether you're
-   starting from an idea, an existing codebase, an existing BRD, or an
-   existing SRS, and drive the rest of the planning phase from there). If
-   any file was skipped because it already existed, add a line pointing at
-   `/agentic-harness:doctor` — it checks whether that pre-existing file is
-   missing anything the current templates have (relevant when re-running
-   `init` in a project bootstrapped by an older version of this plugin).
+4. **Check for an already-completed external planning tool.** Match the
+   project's files against `commands/adapt.md`'s "Known external tools"
+   signature table (one row today: `forge`, signature `pipeline/state.md`
+   exists or `.forge/` exists). If a match is found and
+   `planning.source` isn't already decided, ask (`AskUserQuestion`, never
+   assume): "Found what looks like `<tool>`'s planning output already in
+   this project (evidence: `<matched path>`). Adapt to it — skip
+   agentic-harness's own planning phase and run `/agentic-harness:adapt`
+   to translate it into your execution backlog — or keep them separate
+   and run agentic-harness's own planning (`/agentic-harness:plan`) from
+   scratch?" Record `planning.source` (`external` or `agentic-harness`)
+   accordingly in `project.config.yaml`.
+5. Report (≤6 lines): files created, files skipped (already existed), and
+   the next step — if step 4 found and adopted an external tool, point at
+   `/agentic-harness:adapt`; otherwise `/agentic-harness:plan` (it will
+   ask whether you're starting from an idea, an existing codebase, an
+   existing BRD, or an existing SRS, and drive the rest of the planning
+   phase from there). If any file was skipped because it already existed,
+   add a line pointing at `/agentic-harness:doctor` — it checks whether
+   that pre-existing file is missing anything the current templates have
+   (relevant when re-running `init` in a project bootstrapped by an older
+   version of this plugin).

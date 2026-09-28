@@ -42,6 +42,7 @@ commands/              # -> /agentic-harness:<name> slash commands
   init.md               # scaffold templates/ into a new project
   configure.md           # BRD -> config + BUSINESS_GOALS.md + TASKS.md
   doctor.md               # detect/fix scaffolded files stale vs current templates
+  adapt.md                 # alternative to plan.md -- adopt another tool's already-done planning (e.g. Forge)
   architect.md             # orchestrator: segment/swarm lifecycle, delegate, test, gate, review
   manager.md                # goal-owning, periodic health-check / task-queuing
   test.md                    # thin command wrapper around agentic-harness:test-writer
@@ -49,6 +50,7 @@ commands/              # -> /agentic-harness:<name> slash commands
 agents/
   test-writer.md      # -> agentic-harness:test-writer, standing test author
   codebase-analyst.md  # -> agentic-harness:codebase-analyst, read-only existing-code surveyor
+  external-planning-analyst.md # -> agentic-harness:external-planning-analyst, read-only foreign-planning surveyor
 docs/
   planning-protocol.md # shared questioning/gating/bookkeeping rules for the eight planning commands
 templates/             # copied into a project by /agentic-harness:init

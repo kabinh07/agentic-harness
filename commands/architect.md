@@ -178,14 +178,24 @@ for architect-direct:
 ```
 a. TASKS.md → 🔄 IN_PROGRESS, record Started date. Sync via enabled tool-mirror skill(s).
 b. RED — MANDATORY, every implementation task, dispatched before any code
-   is written: if the task's `TASKS.md` row carries an `EARS-<AREA>-#`
-   reference in its trace tag (`[E-##/F-## · EARS-<AREA>-#]` — see
-   `epics.md`'s Seed TASKS.md section), resolve it to the literal
-   WHEN/IF...SHALL text in `planning/EPICS.md` first — hand `test-writer`
-   that exact acceptance-criterion text, not a paraphrase of the task
-   description. If the task has no EARS reference (an ad hoc/manager-queued
-   task with no planning-phase trace), hand it the plain task description
-   instead — that's expected, not an error. Either way, dispatch the
+   is written: resolve the task's spec from whichever source its
+   `TASKS.md` trace tag points at, before handing anything to
+   `test-writer`:
+   - `[E-##/F-## · EARS-<AREA>-#]` (native planning-phase trace) →
+     resolve to the literal WHEN/IF...SHALL text in `planning/EPICS.md`.
+   - `[<external-task-id> · <owning-segment-id>]` (`planning.source:
+     external` — see `commands/adapt.md`) → resolve to that external
+     tool's own acceptance-criteria/done-when text, via
+     `planning.external_planning.source_artifacts` (e.g. Forge's
+     `pipeline/05-plan/task-dag.md`/`task-breakdown/` entry for that task
+     ID). Same principle as the EARS case — a different upstream source
+     of truth, still literal text, never a paraphrase.
+   - No trace tag at all (an ad hoc/manager-queued task with no
+     planning-phase trace) → hand `test-writer` the plain task description
+     instead — that's expected, not an error.
+
+   Whichever source applies, hand `test-writer` that exact text, not a
+   paraphrase of the task description. Either way, dispatch the
    standing `agentic-harness:test-writer` agent (Mode 1, or invoke it via
    `/agentic-harness:test red <task>`) with that spec, the segment's
    owns_paths, and the goal it serves — there is no diff to hand it, only

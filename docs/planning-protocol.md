@@ -333,8 +333,16 @@ Every stage ends the same way:
    | `design` | the project has no UI | `planning.has_ui` |
    | `erd` | the project has no structured data model | `planning.has_data_model` |
 
-   No other stage is skippable — `brd`, `srs`, `dfd`, `features`, `adr`,
-   `epics` are unconditional.
+   No other stage is skippable individually — `brd`, `srs`, `dfd`,
+   `features`, `adr`, `epics` are unconditional.
+
+   **A separate, whole-pipeline skip exists for `planning.source:
+   external`** (see `commands/adapt.md`): when a project's planning was
+   already done by another agentic tool and adopted via
+   `/agentic-harness:adapt`, every one of the 8 stages above is marked
+   `skipped` at once, noted `(external via <tool>)` to distinguish it from
+   an individual `has_ui`/`has_data_model` skip. This bypasses the native
+   chain entirely rather than skipping one optional stage within it.
 
 A later stage that requires an earlier one to be `approved` (see each
 stage's own gate) refuses to run against a `draft` predecessor — tell the
@@ -364,7 +372,16 @@ draws on; Epic → Feature → SRS requirement → BRD requirement; Task →
 `EARS-<AREA>-#` acceptance line(s) it satisfies → Epic (and, through it,
 the same Feature/SRS/BRD chain). The Task→EARS link is what
 `/agentic-harness:architect`'s RED phase resolves to hand `test-writer`
-literal acceptance-criterion text instead of a paraphrase. A stage
-command that finds an item with no upstream trace reports it as an
+literal acceptance-criterion text instead of a paraphrase.
+
+For a `planning.source: external` project, this chain is replaced by
+Task → the external tool's own task ID → that tool's own upstream chain
+(out of agentic-harness's scope to trace further — it trusts the external
+tool's own traceability for anything above the task level). Architect's
+RED phase resolves the same way, just from the external tool's own
+acceptance-criteria text instead of an EARS line — see `commands/adapt.md`
+and `architect.md`'s Phase 3b.
+
+A stage command that finds an item with no upstream trace reports it as an
 orphan rather than silently keeping or dropping it — see each stage's own
 orphan-check step and the SRS's Appendix A traceability matrix.

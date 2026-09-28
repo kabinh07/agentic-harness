@@ -3,7 +3,7 @@
 # planning/ alongside every other planning artifact so the whole bundle is one
 # shareable folder. Filled in by the planning-phase commands
 # (/agentic-harness:plan, :brd, :srs, :design, :dfd, :erd, :features, :adr,
-# :epics) and /agentic-harness:configure, then kept current by /agentic-harness:architect
+# :epics, :adapt) and /agentic-harness:configure, then kept current by /agentic-harness:architect
 # as the codebase grows. Everything here is read by CLAUDE.md,
 # /agentic-harness:architect, /agentic-harness:manager, and any tool-mirror
 # skill (e.g. clickup-log) before they do anything else.
@@ -21,12 +21,34 @@ project:
 # has_ui: null means unasked, false means the design stage is skipped
 # entirely (design.md never written), "later" means ask again next run.
 # has_data_model gates the erd stage the same way — see below.
+# source/external_planning: when a project's planning was already done by
+# another agentic tool (detected at /agentic-harness:init time), source
+# flips to "external" and every stages.* entry below is marked skipped —
+# a different skip reason from has_ui/has_data_model's per-stage skips,
+# since this bypasses the whole native chain via /agentic-harness:adapt
+# instead of skipping one optional stage.
 planning:
   dir: planning
   versions_dir: planning/versions   # append-only archive; every artifact
     # rewrite copies the current file here first, per planning-protocol.md's
     # Versioning section — never delete from this directory.
   entry_point: ""       # idea | existing-project | brd | srs
+  source: agentic-harness   # agentic-harness | external -- which produced
+    # planning. "external" means an already-existing tool's own planning
+    # output was adapted via /agentic-harness:adapt instead of this
+    # harness's own BRD..EPICS chain -- see external_planning below and
+    # commands/adapt.md. Detected/asked at /agentic-harness:init time.
+  external_planning:
+    tool: null              # null | forge (extensible -- see adapt.md's
+      # Known external tools signature table)
+    source_artifacts: {}    # e.g. {goals: pipeline/01-srs/srs.md, ...} --
+      # the external tool's own files this project's BUSINESS_GOALS.md /
+      # architecture.segments / TASKS.md rows were mirrored from
+    mapped: {}              # {business_goals: true, segments: true, tasks_seeded: N}
+    gaps: []                # open items agentic-harness:external-planning-analyst
+      # found and the user confirmed are still open -- e.g. "T-1265
+      # plan-review hold point still open (tasks/todo.md)". Never silently
+      # resolved; tasks depending on an open gap are seeded BLOCKED, not TODO.
   has_ui: null           # true | false | "later"
   design_source: ""      # claude-design | stitch | figma | none
   has_data_model: null   # true | false | "later" — gates the erd stage; false
