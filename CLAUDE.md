@@ -23,6 +23,29 @@ project with the plugin installed (`claude plugin marketplace add <this
 repo path>` then `claude plugin install agentic-harness`) — not by filling
 in `templates/` in place.
 
+## Version bump — do this in the SAME commit as the change
+
+Any commit touching `commands/`, `agents/`, or `templates/` **must** bump
+`.claude-plugin/plugin.json`'s `version` in that same commit. This has
+been forgotten three times in a row (each caught only when a consuming
+project ran `/plugin marketplace update` + `/reload-plugins` and the new
+command still didn't show up). The reason it matters: a consuming
+project's installed copy is a **pinned cache snapshot**
+(`~/.claude/plugins/cache/agentic-harness/agentic-harness/<version>/`),
+not a live link to this repo. `/plugin marketplace update` only refreshes
+the *marketplace catalog* clone; the installed snapshot only gets
+refreshed when the `version` string itself changes. Push a change without
+bumping the version, and every consuming project silently keeps running
+the old snapshot — no error, no warning, just a missing command until
+someone notices and bumps it after the fact (as happened for the DFD/ERD
+addition, the doctor command, and the adapt command, each requiring a
+follow-up bump commit).
+
+Bump `patch` for a docs/wording-only fix, `minor` for a new command/agent
+or a behavior change to an existing one, `major` only for a breaking
+change to the config schema or command interface a consuming project
+would need to react to.
+
 ## Layout
 
 ```
